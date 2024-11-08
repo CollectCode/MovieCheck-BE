@@ -18,5 +18,5 @@ public class UserDto {
     private int userBad;           // 누적 싫어요
     private String userGrade;      // 등급
     private String userContent;     // 한줄소개
-    private char gender;
+    private int gender;
 }

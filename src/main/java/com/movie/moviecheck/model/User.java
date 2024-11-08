@@ -37,17 +37,17 @@ public class User {
     private int userBad = 0; // 기본값 0
 
     @Column(name = "user_grade", nullable = false, length = 8)
-    private String userGrade;
+    private String userGrade = "관람객";
 
     @Column(name = "user_content", length = 100)
-    private String userContent;
+    private String userContent = "내용을 입력해주세요";
 
     @Transient
-    private char usergender;
+    private int usergender;
 
     // 성별을 인자로 받아 userKey 생성
     public User(String userKey,String userEmail, String userPassword, String userName,
-                int userGood,int userBad, String userGrade,String userContent,char usergender) {
+                int userGood,int userBad, String userGrade,String userContent,int usergender) {
         this.userKey = generateUserKey(usergender);
         this.userEmail = userEmail;
         this.userPassword = userPassword;
@@ -58,11 +58,16 @@ public class User {
         this.userContent = userContent;
     }
 
-    public User(String userEmail, String userPassword, String userName, char usergender) {
+    public User(String userEmail, String userPassword, String userName, int usergender) {
         this.userEmail = userEmail;
         this.userPassword = userPassword;
         this.userName = userName;
         this.usergender = usergender;
+    }
+
+    public User(String userEmail, String userPassword){
+        this.userEmail = userEmail;
+        this.userPassword = userPassword;
     }
 
 
@@ -80,7 +85,7 @@ public class User {
     // }  
 
     // userKey 생성 메서드
-    private String generateUserKey(char usergender) {
+    private String generateUserKey(int usergender) {
         int currentCount = count.incrementAndGet(); // 카운트번호 증가
         return usergender + String.format("%06d", currentCount); // 성별 + 6자리 카운트번호
     }

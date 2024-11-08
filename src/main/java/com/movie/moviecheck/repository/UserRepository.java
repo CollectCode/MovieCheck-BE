@@ -8,4 +8,8 @@ import com.movie.moviecheck.model.User;
 
 public interface UserRepository extends JpaRepository<User,String>  {
     // Optional<User> findByUserEmail(String userEmail);
+    boolean existsByUserEmail(String userEmail);
+    User findByUserEmailAndUserPassword(String userEmail, String userPassword);
+
+    
 }

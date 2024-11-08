@@ -86,6 +86,11 @@ public class UserService {
         return null;
     }
 
+    public boolean isEmailExists(String userEmail) {
+        return userRepository.existsByUserEmail(userEmail);
+    }
 
-
+    public User findByEmailAndPassword(String userEmail, String userPassword) {
+        return userRepository.findByUserEmailAndUserPassword(userEmail, userPassword);
+    }
 }

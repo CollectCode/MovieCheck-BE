@@ -5,7 +5,12 @@ import com.movie.moviecheck.dto.UserDto;
 import com.movie.moviecheck.model.User; // User 모델 클래스 필요
 import com.movie.moviecheck.service.UserService; // 서비스 클래스 필요
 import lombok.RequiredArgsConstructor;
+
+import java.util.Collections;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,6 +27,28 @@ public class UserController {
     //     return ResponseEntity.ok(token); // JWT 토큰 반환
     // }
 
+    // 로그인
+    // /api/users/login
+    @PostMapping("/login")
+    public String showLoginForm(@RequestParam String userEmail, @RequestParam String userPassword, Model model) {
+        // 이메일 존재 여부 확인
+        if (!userService.isEmailExists(userEmail)) {
+            model.addAttribute("error", "Email not found");
+            return "login"; // 이메일이 존재하지 않을 경우 로그인 페이지로 돌아갑니다.
+        }
+
+        // 사용자 정보 검증
+        User user = userService.findByEmailAndPassword(userEmail, userPassword);
+        
+        if (user != null) {
+            // 로그인 성공
+            return "redirect:/main/home"; // 로그인 성공 시 홈으로 리다이렉트
+        } else {
+            // 로그인 실패
+            model.addAttribute("error", "Invalid password");
+            return "login"; // 로그인 페이지로 돌아가면서 에러 메시지 전달
+        }
+    }
 
     // 회원 생성
     // "/api/user/signup"
@@ -30,7 +57,7 @@ public class UserController {
         User user = convertToEntity(userDto);
         User savedUser = userService.createUser(user);
         return convertToDto(savedUser);
-    }
+    }   
 
     // 회원 삭제
     // /api/users/{userKey}
@@ -108,4 +135,20 @@ public class UserController {
             user.getUsergender()
         );
     }
+
+    // @GetMapping("/check-email")
+    // @ResponseBody
+    // public Map<String, Boolean> checkEmail(@RequestParam String userEmail) {
+    //     boolean available = !userService.isEmailTaken(userEmail);
+    //     return Collections.singletonMap("available", available);
+    // }
+
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String userEmail) {
+    boolean exists = userService.isEmailExists(userEmail); // 이메일 존재 여부 확인
+    return ResponseEntity.ok(exists);
+}
+
+
 }
