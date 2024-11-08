@@ -43,26 +43,26 @@ public class User {
     private String userContent = "내용을 입력해주세요";
 
     @Transient
-    private int usergender;
+    private int userGender;
 
     // 성별을 인자로 받아 userKey 생성
     public User(String userKey,String userEmail, String userPassword, String userName,
-                int userGood,int userBad, String userGrade,String userContent,int usergender) {
-        this.userKey = generateUserKey(usergender);
+                int userGood,int userBad,String userContent,int userGender) {
+        this.userKey = generateUserKey(userGender);
         this.userEmail = userEmail;
         this.userPassword = userPassword;
         this.userName = userName;
         this.userGood = userGood;
         this.userBad = userBad;
-        this.userGrade = userGrade;
         this.userContent = userContent;
+        this.userGender = userGender;
     }
 
-    public User(String userEmail, String userPassword, String userName, int usergender) {
+    public User(String userEmail, String userPassword, String userName, int userGender) {
         this.userEmail = userEmail;
         this.userPassword = userPassword;
         this.userName = userName;
-        this.usergender = usergender;
+        this.userGender = userGender;
     }
 
     public User(String userEmail, String userPassword){

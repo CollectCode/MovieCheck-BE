@@ -57,7 +57,7 @@ public class UserController {
         User user = convertToEntity(userDto);
         User savedUser = userService.createUser(user);
         return convertToDto(savedUser);
-    }   
+    }
 
     // 회원 삭제
     // /api/users/{userKey}
@@ -112,12 +112,11 @@ public class UserController {
             userDto.getUserKey(),
             userDto.getUserEmail(),
             userDto.getUserPassword(),
-            userDto.getName(), // 이름으로 변경
+            userDto.getUserName(), // 이름으로 변경
             0, // 초기 누적 좋아요
             0, // 초기 누적 싫어요
-            userDto.getUserGrade(),
             userDto.getUserContent(),
-            userDto.getGender()
+            userDto.getUserGender()
         );
     }
 
@@ -130,9 +129,8 @@ public class UserController {
             user.getUserName(), // 이름으로 변경
             user.getUserGood(),
             user.getUserBad(),
-            user.getUserGrade(),
             user.getUserContent(),
-            user.getUsergender()
+            user.getUserGender()
         );
     }
 
