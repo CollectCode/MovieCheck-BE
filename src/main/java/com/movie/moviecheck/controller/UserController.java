@@ -28,19 +28,19 @@ public class UserController {
     // }
 
     // 로그인
-    // /api/users/login
+    // /api/users/login 
     @PostMapping("/login")
-    public String showLoginForm(@RequestParam String userEmail, @RequestParam String userPassword, Model model) {
+    public String showLoginForm(@RequestBody User user,Model model) {
         // 이메일 존재 여부 확인
-        if (!userService.isEmailExists(userEmail)) {
+        if (!userService.isEmailExists(user.getUserEmail())) {
             model.addAttribute("error", "Email not found");
             return "login"; // 이메일이 존재하지 않을 경우 로그인 페이지로 돌아갑니다.
         }
 
         // 사용자 정보 검증
-        User user = userService.findByEmailAndPassword(userEmail, userPassword);
+        User user1 = userService.findByEmailAndPassword(user.getUserEmail(),user.getUserPassword());
         
-        if (user != null) {
+        if (user1 != null) {
             // 로그인 성공
             return "redirect:/main/home"; // 로그인 성공 시 홈으로 리다이렉트
         } else {
