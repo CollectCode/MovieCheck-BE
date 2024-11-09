@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/genres")
+@RequestMapping("/genres")
 public class GenreController {
 
 
