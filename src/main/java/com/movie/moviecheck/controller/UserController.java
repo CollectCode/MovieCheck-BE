@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Collections;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,28 +28,56 @@ public class UserController {
     //     return ResponseEntity.ok(token); // JWT 토큰 반환
     // }
 
+    @PostMapping("/login")
+    public ResponseEntity<WrapperClass<String>> login(@RequestBody User user) {
+    // 이메일 존재 여부 확인
+    if (!userService.isEmailExists(user.getUserEmail())) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new WrapperClass<>("Email not found")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+    }
+
+    // 사용자 정보 검증
+    User user1 = userService.findByEmailAndPassword(user.getUserEmail(), user.getUserPassword());
+    
+    if (user1 != null) {
+        // 로그인 성공
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new WrapperClass<>("Login successful")); // 로그인 성공 메시지 반환
+    } else {
+        // 로그인 실패
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new WrapperClass<>("Invalid password")); // 로그인 실패 메시지 반환
+    }
+}
+
+
+
+
     // 로그인
     // /api/users/login 
-    @PostMapping("/login")
-    public String showLoginForm(@RequestBody User user,Model model) {
-        // 이메일 존재 여부 확인
-        if (!userService.isEmailExists(user.getUserEmail())) {
-            model.addAttribute("error", "Email not found");
-            return "login"; // 이메일이 존재하지 않을 경우 로그인 페이지로 돌아갑니다.
-        }
+    // @PostMapping("/login")
+    // public String showLoginForm(@RequestBody User user,Model model) {
+    //     // 이메     일 존재 여부 확인
+    //     if (!userService.isEmailExists(user.getUserEmail())) {
+    //         model.addAttribute("error", "Email not found");
+    //         return "login"; // 이메일이 존재하지 않을 경우 로그인 페이지로 돌아갑니다.
+    //     }
 
-        // 사용자 정보 검증
-        User user1 = userService.findByEmailAndPassword(user.getUserEmail(),user.getUserPassword());
+    //     // 사용자 정보 검증
+    //     User user1 = userService.findByEmailAndPassword(user.getUserEmail(),user.getUserPassword());
         
-        if (user1 != null) {
-            // 로그인 성공
-            return "redirect:/main/home"; // 로그인 성공 시 홈으로 리다이렉트
-        } else {
-            // 로그인 실패
-            model.addAttribute("error", "Invalid password");
-            return "login"; // 로그인 페이지로 돌아가면서 에러 메시지 전달
-        }
-    }
+    //     if (user1 != null) {
+    //         // 로그인 성공
+    //         return "redirect:/main/home"; // 로그인 성공 시 홈으로 리다이렉트
+    //     } else {
+    //         // 로그인 실패
+    //         model.addAttribute("error", "Invalid password");
+    //         return "login"; // 로그인 페이지로 돌아가면서 에러 메시지 전달
+    //     }
+    // }
 
     // 회원 생성
     // "/api/user/signup"
