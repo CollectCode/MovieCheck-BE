@@ -89,9 +89,9 @@ public class User {
     // }  
 
     // userKey 생성 메서드
-    private String generateUserKey(int usergender) {
+    private String generateUserKey(int userGender) {
         int currentCount = count.incrementAndGet(); // 카운트번호 증가
-        return usergender + String.format("%06d", currentCount); // 성별 + 6자리 카운트번호
+        return userGender + String.format("%06d", currentCount); // 성별 + 6자리 카운트번호
     }
     
 }

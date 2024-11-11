@@ -144,7 +144,7 @@ public class UserController {
             userDto.getUserName(), // 이름으로 변경
             0, // 초기 누적 좋아요
             0, // 초기 누적 싫어요
-            userDto.getUserContent(),
+            "내용을 입력해주세요",
             userDto.getUserGender()
         );
     }

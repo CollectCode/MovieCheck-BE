@@ -19,8 +19,8 @@
         <input type="text" id="userName" name="userName" required>
     </div>
     <div>
-        <label for="usergender">성별:</label>
-        <select id="usergender" name="usergender" required>
+        <label for="userGender">성별:</label>
+        <select id="userGender" name="userGender" required>
             <option value="1">남성</option>
             <option value="2">여성</option>
         </select>
@@ -61,7 +61,7 @@
                 userEmail: document.getElementById('userEmail').value,
                 userPassword: password, // 사용자가 입력한 비밀번호
                 userName: document.getElementById('userName').value,
-                usergender: document.getElementById('usergender').value
+                userGender: document.getElementById('userGender').value
             };
     
             fetch('/api/users/signup', {
