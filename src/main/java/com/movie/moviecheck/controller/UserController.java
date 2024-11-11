@@ -15,13 +15,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService; // UserService 주입
 
-    // // 로그인
+    // // 로그인 바보
     // @PostMapping("/login")
     // public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
     //     String token = userService.login(loginDto);

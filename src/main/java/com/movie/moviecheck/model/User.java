@@ -1,11 +1,15 @@
 package com.movie.moviecheck.model;
 
-import jakarta.persistence.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Entity
 @Table(name = "users_table")
