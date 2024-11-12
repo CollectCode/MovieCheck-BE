@@ -63,15 +63,18 @@ public class UserController {
     // 회원가입 아이디 중복체크
     @PostMapping("/signup/email")
     public ResponseEntity<WrapperClass<String>> existEmail(@RequestBody UserDto userDto) {
+        String msg = "";
         if (!userService.isEmailExists(userDto.getUserEmail())) {
+            msg = "사용가능한 이메일 입니다.";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>("사용가능한 이메일 입니다."));
+                    .body(new WrapperClass<>(msg));
         }
         else{
+            msg = "중복된 이메일 입니다.";
             return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(new WrapperClass<>("중복된 이메일 입니다.")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+            .status(HttpStatus.OK)
+            .body(new WrapperClass<>(msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
     }
 
