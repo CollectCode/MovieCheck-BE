@@ -25,6 +25,10 @@
             <option value="2">여성</option>
         </select>
     </div>
+    <div>
+        <label for="userContent">한줄소개:</label>
+        <input type="text" id="userContent" name="userContent">
+    </div>
     <button type="submit">회원가입</button>
 
     <script>
@@ -61,7 +65,8 @@
                 userEmail: document.getElementById('userEmail').value,
                 userPassword: password, // 사용자가 입력한 비밀번호
                 userName: document.getElementById('userName').value,
-                userGender: document.getElementById('userGender').value
+                userGender: document.getElementById('userGender').value,
+                userContent: document.getElementById('userContent').value
             };
     
             fetch('/api/users/signup', {

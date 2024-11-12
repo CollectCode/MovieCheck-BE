@@ -29,7 +29,6 @@ public class UserController {
                     .status(HttpStatus.NOT_FOUND)
                     .body(new WrapperClass<>("Email not found")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
-
         // 사용자 정보 검증
         User user1 = userService.findByEmailAndPassword(user.getUserEmail(), user.getUserPassword());
         
@@ -109,7 +108,7 @@ public class UserController {
             userDto.getUserName(), // 이름으로 변경
             0, // 초기 누적 좋아요
             0, // 초기 누적 싫어요
-            "내용을 입력해주세요",
+            userDto.getUserContent(),
             userDto.getUserGender()
         );
     }
