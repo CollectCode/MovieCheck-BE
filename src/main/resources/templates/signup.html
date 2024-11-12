@@ -3,7 +3,13 @@
         <label for="userEmail">이메일:</label>
         <input type="email" id="userEmail" name="userEmail" required>
         <button type="button" onclick="checkEmail()">중복 확인</button>
-        <span id="emailError"></span>
+        <span id="emailError" style="color: red;"></span>
+    </div>
+    <div>
+        <label for="userName">닉네임:</label>
+        <input type="text" id="userName" name="userName" required>
+        <button type="button" onclick="checkName()">중복 확인</button>
+        <span id="nameError" style="color: red;"></span>
     </div>
     <div>
         <label for="userPassword">비밀번호:</label>
@@ -12,11 +18,7 @@
     <div>
         <label for="confirmPassword">비밀번호 확인:</label>
         <input type="password" id="confirmPassword" required>
-        <span id="passwordError"></span>
-    </div>
-    <div>
-        <label for="userName">이름:</label>
-        <input type="text" id="userName" name="userName" required>
+        <span id="passwordError" style="color: red;"></span>
     </div>
     <div>
         <label for="userGender">성별:</label>
@@ -34,33 +36,62 @@
     <script>
         function checkEmail() {
             const email = document.getElementById('userEmail').value;
-    
-            fetch(`/api/users/check-email?email=${email}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        document.getElementById('emailError').innerText = '이미 사용 중인 이메일입니다.';
-                    } else {
-                        document.getElementById('emailError').innerText = '사용 가능한 이메일입니다.';
-                    }
-                })
-                .catch(error => console.error('Error:', error));
+            fetch('/api/users/signup/email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userEmail: email })
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('emailError').innerText = '사용 가능한 이메일입니다.';
+                } else if (response.status === 404) {
+                    document.getElementById('emailError').innerText = '중복된 이메일입니다.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('emailError').innerText = '이메일 확인 중 오류가 발생했습니다.';
+            });
         }
 
+        function checkName() {
+            const name = document.getElementById('userName').value;
+
+            fetch('/api/signup/name', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userName: name })
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('nameError').innerText = '사용 가능한 닉네임입니다.';
+                } else if (response.status === 404) {
+                    document.getElementById('nameError').innerText = '중복된 닉네임입니다.';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('nameError').innerText = '닉네임 확인 중 오류가 발생했습니다.';
+            });
+        }
 
         document.getElementById('signupForm').onsubmit = function(event) {
             event.preventDefault(); // 기본 폼 제출 방지
-    
+
             const password = document.getElementById('userPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-    
+
             if (password !== confirmPassword) {
                 document.getElementById('passwordError').innerText = '비밀번호가 일치하지 않습니다.';
                 return;
             } else {
                 document.getElementById('passwordError').innerText = ''; // 오류 메시지 초기화
             }
-    
+
             const userData = {
                 userEmail: document.getElementById('userEmail').value,
                 userPassword: password, // 사용자가 입력한 비밀번호
@@ -68,7 +99,7 @@
                 userGender: document.getElementById('userGender').value,
                 userContent: document.getElementById('userContent').value
             };
-    
+
             fetch('/api/users/signup', {
                 method: 'POST',
                 headers: {
@@ -90,5 +121,4 @@
             });
         };
     </script>
-    
 </form>

@@ -77,4 +77,9 @@ public class UserService {
     public User findByEmailAndPassword(String userEmail, String userPassword) {
         return userRepository.findByUserEmailAndUserPassword(userEmail, userPassword);
     }
+
+    // 세션아이디를 통해서 사용자 조회
+    public User findBySessionId(String sessionId) {
+        return userRepository.findBySessionId(sessionId); // 세션 ID로 사용자 조회
+    }
 }

@@ -26,6 +26,10 @@ public class UserDto {
         this.userGender = userGender;
     }
 
+    public UserDto(String userEmail, String userName) {
+        this.userEmail = userEmail;
+        this.userName = userName;
+    }
 
 
     // userDto.getUserKey(),

@@ -1,12 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>메인 페이지</title>
 </head>
 <body>
-    <a href="/main/login">로그인</a>
-    <a href="/main/signup">회원가입</a>
+    <div id="user-info">
+        <!-- 여기에 로그인 상태에 따라 닉네임이나 로그인/회원가입 링크가 표시됩니다 -->
+    </div>
+
+    <script>
+        // 로그인 상태 확인을 위한 예제 함수
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        const sessionId = getCookie("SESSIONID");
+        
+        // 서버에서 닉네임 정보 요청
+        if (sessionId) {
+            fetch("/api/users/profile", { // 사용자의 프로필을 가져오는 엔드포인트를 호출해야 함
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "SESSIONID": sessionId
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.userName) {
+                    document.getElementById("user-info").innerHTML = 
+                        `<a href="/main/myPage">${data.userName}님</a>`;
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        } else {
+            // 로그인 상태가 아닐 경우 로그인/회원가입 링크 표시
+            document.getElementById("user-info").innerHTML = `
+                <a href="/main/login">로그인</a> | <a href="/main/signup">회원가입</a>`;
+        }
+    </script>
 </body>
 </html>
