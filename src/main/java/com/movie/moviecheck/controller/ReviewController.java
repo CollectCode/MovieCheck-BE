@@ -26,7 +26,7 @@ public class ReviewController {
         Review savedReview = reviewService.addReview(review);
         return ResponseEntity.ok(savedReview);
     }
-
+    
     // 리뷰 삭제
     // /api/reviews/{reviewKey}
     @DeleteMapping("/{reviewKey}")
@@ -46,7 +46,7 @@ public class ReviewController {
     // 특정 사용자에 대한 모든 리뷰 조회
     // /api/reviews/user/{userKey}
     @GetMapping("/user/{userKey}")
-    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable String userKey) {
+    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable int userKey) {
         List<Review> reviews = reviewService.getReviewsByUser(userKey);
         return ResponseEntity.ok(reviews);
     }

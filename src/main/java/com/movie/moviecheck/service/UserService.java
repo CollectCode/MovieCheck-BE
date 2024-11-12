@@ -20,22 +20,6 @@ public class UserService {
 
     private final UserRepository userRepository; // UserRepository 주입
 
-    // private final BCryptPasswordEncoder passwordEncoder;
-
-    // private final JwtUtil jwtUtil;
-
-    // // 로그인 메서드
-    // public String login(LoginDto loginDto) {
-    //     Optional<User> user = userRepository.findByUserEmail(loginDto.getUserEmail());
-
-    //     if (user.isPresent() && passwordEncoder.matches(loginDto.getUserPassword(), user.get().getUserPassword())) {
-    //         // 비밀번호가 일치하면 JWT 토큰 생성
-    //         return jwtUtil.generateToken(user.get().getUserEmail());
-    //     } else {
-    //         throw new RuntimeException("Invalid email or password");
-    //     }
-    // }
-
     private static Map<String, User> userDatabase = new HashMap<>(); // 이메일로 사용자 관리
     private static Map<String, User> nameDatabase = new HashMap<>();  // 닉네임으로 사용자 관리
 
@@ -45,7 +29,7 @@ public class UserService {
     }
 
     // 회원 삭제
-    public boolean deleteUser(String userKey) {
+    public boolean deleteUser(Integer userKey) {
         if (userRepository.existsById(userKey)) {
             userRepository.deleteById(userKey);
             return true;
@@ -54,7 +38,7 @@ public class UserService {
     }
 
     // 이름 변경
-    public User updateName(String userKey, String newName) {
+    public User updateName(Integer userKey, String newName) {
         Optional<User> userOptional = userRepository.findById(userKey);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -65,7 +49,7 @@ public class UserService {
     }
 
     // 비밀번호 변경
-    public User updatePassword(String userKey, String newPassword) {
+    public User updatePassword(Integer userKey, String newPassword) {
         Optional<User> userOptional = userRepository.findById(userKey);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -76,7 +60,7 @@ public class UserService {
     }
 
     // 한줄소개 변경
-    public User updateContent(String userKey, String newContent) {
+    public User updateContent(Integer userKey, String newContent) {
         Optional<User> userOptional = userRepository.findById(userKey);
         if (userOptional.isPresent()) {
             User user = userOptional.get();

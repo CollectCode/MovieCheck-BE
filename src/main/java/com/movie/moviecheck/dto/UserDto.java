@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-    private String userKey;       // 회원번호
+    private int userKey;       // 회원번호
     private String userEmail;     // 회원 이메일
     private String userPassword;   // 회원 비밀번호
     private String userName;           // 사용자 이름 (닉네임)

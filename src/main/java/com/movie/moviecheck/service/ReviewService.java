@@ -32,7 +32,7 @@ public class ReviewService {
     }
 
     // 특정 사용자의 모든 리뷰 조회
-    public List<Review> getReviewsByUser(String userKey) {
+    public List<Review> getReviewsByUser(int userKey) {
         return reviewRepository.findByUser_UserKey(userKey);
     }
 

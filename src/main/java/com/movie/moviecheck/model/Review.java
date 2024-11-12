@@ -31,7 +31,7 @@ public class Review {
     private Movie movie; // Movie 엔티티와의 관계
 
     @ManyToOne
-    @JoinColumn(name = "user_key", referencedColumnName = "user_key", nullable = false)
+    @JoinColumn(name = "user_key", referencedColumnName = "userKey") // userKey로 매핑
     private User user; // User 엔티티와의 관계
 
     @Column(name = "review_content", nullable = false, length = 255)
