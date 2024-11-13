@@ -100,15 +100,18 @@ public class UserController {
     // 회원가입 닉네임 중복체크
     @PostMapping("/signup/name")
     public ResponseEntity<WrapperClass<String>> existName(@RequestBody UserDto userDto) {
-        if (!userService.isEmailExists(userDto.getUserName())) {
+        String msg = "";
+        if (!userService.isNameExists(userDto.getUserName())) {
+            msg = "사용가능한 닉네임 입니다.";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>("사용가능한 닉네임 입니다."));
+                    .body(new WrapperClass<>(msg));
         }
         else{
+            msg = "중복된 닉네임 입니다.";
             return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(new WrapperClass<>("중복된 닉네임 입니다.")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+            .status(HttpStatus.OK)
+            .body(new WrapperClass<>(msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
     }
 
