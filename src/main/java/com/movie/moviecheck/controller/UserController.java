@@ -3,6 +3,7 @@ package com.movie.moviecheck.controller;
 import com.movie.moviecheck.dto.LoginDto;
 import com.movie.moviecheck.dto.UserDto;
 import com.movie.moviecheck.model.User; // User 모델 클래스 필요
+import com.movie.moviecheck.password.PasswordUtils;
 import com.movie.moviecheck.service.UserService; // 서비스 클래스 필요
 // import com.movie.moviecheck.session.SessionStore;
 
@@ -42,10 +43,13 @@ public class UserController {
                     .body(new WrapperClass<>("Email not found")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
 
-        // 사용자 정보 검증
-        User authenticatedUser = userService.findByEmailAndPassword(user.getUserEmail(), user.getUserPassword());
+        // 입력한 비밀번호 해싱
+        String hashedInputPassword = PasswordUtils.hashPassword(user.getUserPassword());
 
-        if (authenticatedUser.getUserEmail() != null || authenticatedUser.getUserPassword() != null) {
+        // 사용자 정보 검증
+        User authenticatedUser = userService.findByEmailAndPassword(user.getUserEmail(), hashedInputPassword);
+
+        if (authenticatedUser != null) {
             // 로그인 성공 시 세션 생성
             HttpSession session = request.getSession(true); // 세션이 없으면 새로 생성
             session.setAttribute("userKey", authenticatedUser.getUserKey()); // userKey 저장
@@ -70,14 +74,21 @@ public class UserController {
         }
     }
 
+
     
     // 회원가입
     @PostMapping("/signup")
     public UserDto createUser(@RequestBody UserDto userDto) {
         User user = convertToEntity(userDto);
+        
+        // 비밀번호 해싱
+        String hashedPassword = PasswordUtils.hashPassword(user.getUserPassword());
+        user.setUserPassword(hashedPassword); // 해싱된 비밀번호로 설정
+
         User savedUser = userService.createUser(user);
         return convertToDto(savedUser);
     }
+
 
     // 회원가입 아이디 중복체크
     @PostMapping("/signup/email")
