@@ -47,6 +47,9 @@ public class User {
     @Column(name = "user_gender", nullable = false)
     private int userGender;
 
+    @Transient
+    private String sessionId;
+
     // 성별을 인자로 받아 userKey 생성
     public User(Integer userKey,String userEmail, String userPassword, String userName,
                 int userGood,int userBad,String userContent,int userGender) {

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -77,9 +78,27 @@ public class UserService {
     public User findByEmailAndPassword(String userEmail, String userPassword) {
         return userRepository.findByUserEmailAndUserPassword(userEmail, userPassword);
     }
+    public User findByEmail(String userEmail) {
+        return userRepository.findByUserEmail(userEmail);
+    }
 
-    // 세션아이디를 통해서 사용자 조회
-    // public User findBySessionId(String sessionId) {
-    //     return userRepository.findBySessionId(sessionId); // 세션 ID로 사용자 조회
-    // }
+    // --------------------------------------------------
+
+    private final ConcurrentHashMap<Integer, String> userSessions = new ConcurrentHashMap<>();
+
+    public void saveSession(Integer userKey, String sessionId) {
+        userSessions.put(userKey, sessionId);
+    }
+
+    public String getSession(Integer userKey) {
+        return userSessions.get(userKey);
+    }
+
+    public void removeSession(Integer userKey) {
+        userSessions.remove(userKey);
+    }
+    // 추가: 사용자 정보를 가져오는 메소드
+    public User getUserByKey(Integer userKey) {
+        return userRepository.findByUserKey(userKey);
+    }
 }

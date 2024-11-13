@@ -26,4 +26,8 @@ public class MainController {
     public String signupPage() {
         return "signup";
     }
+    @GetMapping(path = "/mypage")
+    public String myPage() {
+        return "mypage";
+    }    
 }

@@ -7,7 +7,9 @@ import com.movie.moviecheck.service.UserService; // 서비스 클래스 필요
 // import com.movie.moviecheck.session.SessionStore;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
@@ -17,6 +19,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,28 +32,44 @@ public class UserController {
     // private final SessionStore sessionStore;  
 
     @PostMapping("/login")
-    public ResponseEntity<WrapperClass<String>> login(@RequestBody User user) {
+    public ResponseEntity<WrapperClass<String>> login(
+            @RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
+
         // 이메일 존재 여부 확인
         if (!userService.isEmailExists(user.getUserEmail())) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(new WrapperClass<>("Email not found")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
+
         // 사용자 정보 검증
-        User user1 = userService.findByEmailAndPassword(user.getUserEmail(), user.getUserPassword());
-        
-        if (user1 != null) {
-            // 로그인 성공
+        User authenticatedUser = userService.findByEmailAndPassword(user.getUserEmail(), user.getUserPassword());
+
+        if (authenticatedUser.getUserEmail() != null || authenticatedUser.getUserPassword() != null) {
+            // 로그인 성공 시 세션 생성
+            HttpSession session = request.getSession(true); // 세션이 없으면 새로 생성
+            session.setAttribute("userKey", authenticatedUser.getUserKey()); // userKey 저장
+
+            // 세션 ID를 메모리에 저장
+            userService.saveSession(authenticatedUser.getUserKey(), session.getId());
+
+            // 클라이언트에 세션 ID를 쿠키로 전달
+            Cookie sessionCookie = new Cookie("SESSIONID", session.getId());
+            sessionCookie.setHttpOnly(true);
+            sessionCookie.setPath("/");
+            sessionCookie.setMaxAge(60 * 60); // 쿠키 유효 시간 (예: 1시간)
+            response.addCookie(sessionCookie);
+
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(new WrapperClass<>("Login successful")); // 로그인 성공 메시지 반환
         } else {
-            // 로그인 실패
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(new WrapperClass<>("Invalid password")); // 로그인 실패 메시지 반환
         }
     }
+
     
     // 회원가입
     @PostMapping("/signup")
@@ -92,36 +111,49 @@ public class UserController {
             .body(new WrapperClass<>("중복된 닉네임 입니다.")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
     }
-        // 사용자의 프로필 가져오기
-        // @GetMapping("/profile")
-        // public ResponseEntity<WrapperClass<Map<String, String>>> getProfile(
-        //         @CookieValue(value = "SESSIONID", required = false) String sessionId) {
-            
-        //     // 세션 ID가 없는 경우, 로그인되지 않은 상태이므로 UNAUTHORIZED 응답 반환
-        //     if (sessionId == null) {
-        //         return ResponseEntity
-        //                 .status(HttpStatus.UNAUTHORIZED)
-        //                 .body(new WrapperClass<>(Map.of("message", "User not logged in")));
-        //     }
 
-        //     // 세션 ID를 통해 사용자를 조회
-        //     User user = userService.findBySessionId(sessionId);
-            
-        //     // 사용자가 없는 경우, 세션이 유효하지 않으므로 UNAUTHORIZED 응답 반환
-        //     if (user == null) {
-        //         return ResponseEntity
-        //                 .status(HttpStatus.UNAUTHORIZED)
-        //                 .body(new WrapperClass<>(Map.of("message", "Invalid session")));
-        //     }
+    @GetMapping("/mypage")
+    public ResponseEntity<User> myPage(HttpServletRequest request) {
+        HttpSession session = request.getSession(false); // 기존 세션을 가져옴
+        if (session != null) {
+            Integer userKey = (Integer) session.getAttribute("userKey"); // 세션에서 userKey 가져오기
+            if (userKey != null) {
+                // 서버 메모리에서 세션 ID 확인 (필요시)
+                String sessionId = userService.getSession(userKey);
+                // 사용자 정보 가져오기
+                User user = userService.getUserByKey(userKey);
+                return ResponseEntity.ok(user); // 사용자 정보를 반환
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 세션이 없거나 유효하지 않으면 401 반환
+    }
+        
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
 
-        //     // 닉네임 정보 반환
-        //     Map<String, String> responseBody = new HashMap<>();
-        //     responseBody.put("userName", user.getUserName()); // 사용자 닉네임
+        Cookie jsessionCookie = new Cookie("JSESSIONID", null);
+        jsessionCookie.setHttpOnly(true);
+        jsessionCookie.setPath("/");
+        jsessionCookie.setMaxAge(0);
+        response.addCookie(jsessionCookie);
 
-        //     return ResponseEntity
-        //             .status(HttpStatus.OK)
-        //             .body(new WrapperClass<>(responseBody));
-        // }
+        Cookie sessionCookie = new Cookie("SESSIONID", null);
+        sessionCookie.setHttpOnly(true);
+        sessionCookie.setPath("/");
+        sessionCookie.setMaxAge(0);
+        response.addCookie(sessionCookie);
+
+        // 로그아웃 후 리다이렉트
+        response.setHeader("Location", "/");
+        response.setStatus(HttpServletResponse.SC_FOUND);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
 
 
 

@@ -6,12 +6,13 @@
     <title>메인 페이지</title>
 </head>
 <body>
+    <h1>환영합니다!</h1>
     <div id="user-info">
         <!-- 여기에 로그인 상태에 따라 닉네임이나 로그인/회원가입 링크가 표시됩니다 -->
     </div>
 
     <script>
-        // 로그인 상태 확인을 위한 예제 함수
+        // 쿠키 값을 가져오는 함수
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -22,25 +23,43 @@
         
         // 서버에서 닉네임 정보 요청
         if (sessionId) {
-            fetch("/api/users/profile", { // 사용자의 프로필을 가져오는 엔드포인트를 호출해야 함
+            fetch("/api/users/profile", { // 사용자의 프로필을 가져오는 엔드포인트를 호출
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "SESSIONID": sessionId
+                    "SESSIONID": sessionId // 세션 ID를 헤더에 추가
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.userName) {
                     document.getElementById("user-info").innerHTML = 
-                        `<a href="/main/myPage">${data.userName}님</a>`;
+                        `<p>${data.userName}님, 환영합니다!</p>
+                         <a href="/main/myPage">내 페이지</a> | 
+                         <a href="/api/users/logout">로그아웃</a>`; // 로그아웃 링크 추가
+                } else {
+                    // 사용자 정보가 없을 경우
+                    document.getElementById("user-info").innerHTML = `
+                        <a href="/main/login">로그인</a> | 
+                        <a href="/main/signup">회원가입</a>`;
                 }
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("user-info").innerHTML = `
+                    <a href="/main/login">로그인</a> | 
+                    <a href="/main/signup">회원가입</a>`;
+            });
         } else {
             // 로그인 상태가 아닐 경우 로그인/회원가입 링크 표시
             document.getElementById("user-info").innerHTML = `
-                <a href="/main/login">로그인</a> | <a href="/main/signup">회원가입</a>`;
+                <a href="/main/login">로그인</a> | 
+                <a href="/main/signup">회원가입</a>`;
         }
     </script>
 </body>
