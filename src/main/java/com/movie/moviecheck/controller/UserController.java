@@ -42,7 +42,6 @@ public class UserController {
                     .status(HttpStatus.NOT_FOUND)
                     .body(new WrapperClass<>("Email not found")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
-
         // 입력한 비밀번호 해싱
         String hashedInputPassword = PasswordUtils.hashPassword(user.getUserPassword());
 
@@ -73,9 +72,6 @@ public class UserController {
                     .body(new WrapperClass<>("Invalid password")); // 로그인 실패 메시지 반환
         }
     }
-
-
-    
     // 회원가입
     @PostMapping("/signup")
     public UserDto createUser(@RequestBody UserDto userDto) {
@@ -88,8 +84,6 @@ public class UserController {
         User savedUser = userService.createUser(user);
         return convertToDto(savedUser);
     }
-
-
     // 회원가입 아이디 중복체크
     @PostMapping("/signup/email")
     public ResponseEntity<WrapperClass<String>> existEmail(@RequestBody UserDto userDto) {
@@ -107,7 +101,6 @@ public class UserController {
             .body(new WrapperClass<>(msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
     }
-
     // 회원가입 닉네임 중복체크
     @PostMapping("/signup/name")
     public ResponseEntity<WrapperClass<String>> existName(@RequestBody UserDto userDto) {
@@ -125,7 +118,7 @@ public class UserController {
             .body(new WrapperClass<>(msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
     }
-
+    // 마이페이지
     @GetMapping("/mypage")
     public ResponseEntity<User> myPage(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // 기존 세션을 가져옴
@@ -141,7 +134,7 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 세션이 없거나 유효하지 않으면 401 반환
     }
-        
+    // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
@@ -166,11 +159,6 @@ public class UserController {
         response.setStatus(HttpServletResponse.SC_FOUND);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
-
-
-
-
     // 회원 삭제
     // /api/users/{userKey}
     @DeleteMapping("/{userKey}")
@@ -181,7 +169,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
     // 이름 변경
     // /api/users/{userKey}/name
     @PutMapping("/{userKey}/name")
@@ -193,7 +180,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
     // 비밀번호 변경
     // /api/users/{userKey}/password
     @PutMapping("/{userKey}/password")
@@ -205,7 +191,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
     // 한줄소개 변경
     // /api/users/{userKey}/content
     @PutMapping("/{userKey}/content")
@@ -217,7 +202,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
     // UserDto를 User로 변환하는 메서드
     private User convertToEntity(UserDto userDto) {
         return new User(
@@ -231,7 +215,6 @@ public class UserController {
             userDto.getUserGender()
         );
     }
-
     // User를 UserDto로 변환하는 메서드
     private UserDto convertToDto(User user) {
         return new UserDto(
@@ -245,10 +228,4 @@ public class UserController {
             user.getUserGender()
         );
     }
-
-    // @PostMapping("/check-email")
-    // public ResponseEntity<Boolean> checkEmail(@RequestParam String userEmail) {
-    // boolean exists = userService.isEmailExists(userEmail); // 이메일 존재 여부 확인
-    // return ResponseEntity.ok(exists);
-    // }
 }
