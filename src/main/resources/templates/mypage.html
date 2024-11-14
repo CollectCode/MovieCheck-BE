@@ -17,12 +17,12 @@
             })
             .then(user => {
                 // 사용자 정보를 페이지에 표시
-                document.getElementById('userEmail').textContent = user.userEmail;
-                document.getElementById('userName').textContent = user.userName;
-                document.getElementById('userGood').textContent = user.userGood;
-                document.getElementById('userBad').textContent = user.userBad;
-                document.getElementById('userContent').textContent = user.userContent;
-                document.getElementById('userGender').textContent = user.userGender === 1 ? '남성' : '여성'; // 예시: 1은 남성, 2는 여성으로 가정
+                document.getElementById('userEmail').textContent = user.data.userEmail;
+                document.getElementById('userName').textContent = user.data.userName;
+                document.getElementById('userGood').textContent = user.data.userGood;
+                document.getElementById('userBad').textContent = user.data.userBad;
+                document.getElementById('userContent').textContent = user.data.userContent;
+                document.getElementById('userGender').textContent = user.data.userGender === 1 ? '남성' : '여성'; // 예시: 1은 남성, 2는 여성으로 가정
             })
             .catch(error => {
                 alert(error.message); // 에러 메시지 표시
@@ -71,5 +71,6 @@
     <form onsubmit="logout(event)" method="post">
         <button type="submit">로그아웃</button>
     </form>
+    <button onclick="window.location.href = 'updatemypage'">마이페이지 수정</button>
 </body>
 </html>

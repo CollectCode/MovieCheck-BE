@@ -30,4 +30,8 @@ public class MainController {
     public String myPage() {
         return "mypage";
     }    
+    @GetMapping(path = "/updatemypage")
+    public String myPageUpdate() {
+        return "updatemypage";
+    }
 }

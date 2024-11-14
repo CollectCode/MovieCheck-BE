@@ -36,18 +36,18 @@ public class UserController {
     public ResponseEntity<WrapperClass<String>> login(
             @RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
 
+        String msg = "";
         // 이메일 존재 여부 확인
         if (!userService.isEmailExists(user.getUserEmail())) {
+            msg = "Email not found";
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new WrapperClass<>("Email not found")); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+                    .status(HttpStatus.OK)
+                    .body(new WrapperClass<>(null,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
         // 입력한 비밀번호 해싱
         String hashedInputPassword = PasswordUtils.hashPassword(user.getUserPassword());
-
         // 사용자 정보 검증
         User authenticatedUser = userService.findByEmailAndPassword(user.getUserEmail(), hashedInputPassword);
-
         if (authenticatedUser != null) {
             // 로그인 성공 시 세션 생성
             HttpSession session = request.getSession(true); // 세션이 없으면 새로 생성
@@ -58,18 +58,19 @@ public class UserController {
 
             // 클라이언트에 세션 ID를 쿠키로 전달
             Cookie sessionCookie = new Cookie("SESSIONID", session.getId());
-            sessionCookie.setHttpOnly(true);
+            sessionCookie.setHttpOnly(false);
             sessionCookie.setPath("/");
             sessionCookie.setMaxAge(60 * 60); // 쿠키 유효 시간 (예: 1시간)
             response.addCookie(sessionCookie);
-
+            msg = "Login successful";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>("Login successful")); // 로그인 성공 메시지 반환
+                    .body(new WrapperClass<>(null,msg)); // 로그인 성공 메시지 반환
         } else {
+            msg = "Invalid password";
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new WrapperClass<>("Invalid password")); // 로그인 실패 메시지 반환
+                    .status(HttpStatus.OK)
+                    .body(new WrapperClass<>(null,msg)); // 로그인 실패 메시지 반환
         }
     }
     // 회원가입
@@ -89,16 +90,16 @@ public class UserController {
     public ResponseEntity<WrapperClass<String>> existEmail(@RequestBody UserDto userDto) {
         String msg = "";
         if (!userService.isEmailExists(userDto.getUserEmail())) {
-            msg = "사용가능한 이메일 입니다.";
+            msg = "available email";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(msg));
+                    .body(new WrapperClass<>(null,msg));
         }
         else{
-            msg = "중복된 이메일 입니다.";
+            msg = "unavailable email";
             return ResponseEntity
             .status(HttpStatus.OK)
-            .body(new WrapperClass<>(msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+            .body(new WrapperClass<>(null,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
     }
     // 회원가입 닉네임 중복체크
@@ -106,22 +107,23 @@ public class UserController {
     public ResponseEntity<WrapperClass<String>> existName(@RequestBody UserDto userDto) {
         String msg = "";
         if (!userService.isNameExists(userDto.getUserName())) {
-            msg = "사용가능한 닉네임 입니다.";
+            msg = "available nickname";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(msg));
+                    .body(new WrapperClass<>(null,msg));
         }
         else{
-            msg = "중복된 닉네임 입니다.";
+            msg = "unavailable nickname";
             return ResponseEntity
             .status(HttpStatus.OK)
-            .body(new WrapperClass<>(msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+            .body(new WrapperClass<>(null,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
     }
     // 마이페이지
     @GetMapping("/mypage")
-    public ResponseEntity<User> myPage(HttpServletRequest request) {
+    public ResponseEntity<WrapperClass<User>> myPage(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // 기존 세션을 가져옴
+        String msg = "";
         if (session != null) {
             Integer userKey = (Integer) session.getAttribute("userKey"); // 세션에서 userKey 가져오기
             if (userKey != null) {
@@ -129,17 +131,26 @@ public class UserController {
                 String sessionId = userService.getSession(userKey);
                 // 사용자 정보 가져오기
                 User user = userService.getUserByKey(userKey);
-                return ResponseEntity.ok(user); // 사용자 정보를 반환
+                msg = "User information has been successfully retrieved.";
+                return ResponseEntity.ok(new WrapperClass<>(user, msg)); // 사용자 정보를 메시지와 함께 반환
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 세션이 없거나 유효하지 않으면 401 반환
+        msg = "Session does not exist or is invalid.";
+        return ResponseEntity.status(HttpStatus.OK).body(new WrapperClass<>(null, msg)); // 세션이 없거나 유효하지 않으면 401 반환
     }
+
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<WrapperClass<String>> logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
+        String msg = "";
         if (session != null) {
             session.invalidate();
+        }else{
+            msg = "logout failed";
+            return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(new WrapperClass<>(null,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
 
         Cookie jsessionCookie = new Cookie("JSESSIONID", null);
@@ -149,7 +160,7 @@ public class UserController {
         response.addCookie(jsessionCookie);
 
         Cookie sessionCookie = new Cookie("SESSIONID", null);
-        sessionCookie.setHttpOnly(true);
+        sessionCookie.setHttpOnly(false);
         sessionCookie.setPath("/");
         sessionCookie.setMaxAge(0);
         response.addCookie(sessionCookie);
@@ -157,7 +168,8 @@ public class UserController {
         // 로그아웃 후 리다이렉트
         response.setHeader("Location", "/");
         response.setStatus(HttpServletResponse.SC_FOUND);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        msg = "logout sucessed";
+        return ResponseEntity.status(HttpStatus.OK).body(new WrapperClass<>(null,msg));
     }
     // 회원 삭제
     // /api/users/{userKey}
@@ -184,7 +196,8 @@ public class UserController {
     // /api/users/{userKey}/password
     @PutMapping("/{userKey}/password")
     public ResponseEntity<UserDto> updatePassword(@PathVariable Integer userKey, @RequestParam String newPassword) {
-        User updatedUser = userService.updatePassword(userKey, newPassword);
+        String hashedPassword = PasswordUtils.hashPassword(newPassword); // 비밀번호 해싱
+        User updatedUser = userService.updatePassword(userKey, hashedPassword);
         if (updatedUser != null) {
             return ResponseEntity.ok(convertToDto(updatedUser));
         } else {
