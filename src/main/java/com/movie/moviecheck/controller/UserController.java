@@ -206,11 +206,19 @@ public class UserController {
     // 회원 삭제
     // /api/users/{userKey}
     @DeleteMapping("/{userKey}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("userKey") Integer userKey) {
+    public ResponseEntity<WrapperClass<String>> deleteUser(@PathVariable("userKey") Integer userKey) {
+        String msg;
+    
         if (userService.deleteUser(userKey)) {
-            return ResponseEntity.noContent().build();
+            msg = "User deleted successfully";
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new WrapperClass<>(null, msg));
         } else {
-            return ResponseEntity.notFound().build();
+            msg = "User not found";
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new WrapperClass<>(null, msg));
         }
     }
     // 사용자 정보 업데이트
