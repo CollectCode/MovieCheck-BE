@@ -13,6 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +44,8 @@ public class UserController {
         // 이메일 존재 여부 확인
         if (!userService.isEmailExists(user.getUserEmail())) {
             msg = "Email not found";
-            return ResponseEntity
-                    .status(HttpStatus.OK)
+            return ResponseEntity // 404 : 요청한 리소스를 찾을 수 없을 때
+                    .status(HttpStatus.NOT_FOUND)
                     .body(new WrapperClass<>(null,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
         // 입력한 비밀번호 해싱
@@ -54,13 +56,11 @@ public class UserController {
             // 로그인 성공 시 세션 생성
             HttpSession session = request.getSession(true); // 세션이 없으면 새로 생성
             session.setAttribute("userKey", authenticatedUser.getUserKey()); // userKey 저장
-
             // 세션 ID를 메모리에 저장
             userService.saveSession(authenticatedUser.getUserKey(), session.getId());
-
             // 클라이언트에 세션 ID를 쿠키로 전달
             Cookie sessionCookie = new Cookie("SESSIONID", session.getId());
-            sessionCookie.setHttpOnly(false);
+            sessionCookie.setHttpOnly(true);
             sessionCookie.setPath("/");
             sessionCookie.setMaxAge(60 * 60); // 쿠키 유효 시간 (예: 1시간)
             response.addCookie(sessionCookie);
@@ -70,8 +70,8 @@ public class UserController {
                     .body(new WrapperClass<>(null,msg)); // 로그인 성공 메시지 반환
         } else {
             msg = "Invalid password";
-            return ResponseEntity
-                    .status(HttpStatus.OK)
+            return ResponseEntity// 401 : 인증이 필요한 요청이지만, 인증 정보가 없거나 잘못되었을 때
+                    .status(HttpStatus.UNAUTHORIZED) 
                     .body(new WrapperClass<>(null,msg)); // 로그인 실패 메시지 반환
         }
     }
@@ -100,8 +100,8 @@ public class UserController {
         else{
             msg = "unavailable email";
             return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(new WrapperClass<>(null,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+            .status(HttpStatus.CONFLICT) // 409 : 요청이 현재 서버 상태와 충돌할 때
+            .body(new WrapperClass<>(null,msg)); // 이메일이 존재 할 때
         }
     }
     // 회원가입 닉네임 중복체크
@@ -117,8 +117,8 @@ public class UserController {
         else{
             msg = "unavailable nickname";
             return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(new WrapperClass<>(null,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+            .status(HttpStatus.CONFLICT) // 409 : 요청이 현재 서버 상태와 충돌할 때
+            .body(new WrapperClass<>(null,msg)); // 닉네임이 존재 할 때
         }
     }
     // 마이페이지
@@ -133,12 +133,12 @@ public class UserController {
                 String sessionId = userService.getSession(userKey);
                 // 사용자 정보 가져오기
                 User user = userService.findByKey(userKey);
-                msg = "User information has been successfully retrieved.";
+                msg = "mypage found Successed";
                 return ResponseEntity.ok(new WrapperClass<>(user, msg)); // 사용자 정보를 메시지와 함께 반환
             }
         }
-        msg = "Session does not exist or is invalid.";
-        return ResponseEntity.status(HttpStatus.OK).body(new WrapperClass<>(null, msg)); // 세션이 없거나 유효하지 않으면 401 반환
+        msg = "mypage not found"; // 403 : 서버가 요청을 이해했지만, 접근을 거부했을 때
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new WrapperClass<>(null, msg)); // 세션이 없거나 유효하지 않으면 401 반환
     }
 
     // 로그아웃
@@ -148,13 +148,7 @@ public class UserController {
         String msg = "logout sucessed";
         if (session != null) {
             session.invalidate();
-        }else{
-            msg = "logout failed";
-            return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(new WrapperClass<>(null,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
-
         Cookie jsessionCookie = new Cookie("JSESSIONID", null);
         jsessionCookie.setHttpOnly(true);
         jsessionCookie.setPath("/");
@@ -174,20 +168,40 @@ public class UserController {
     }
 
     // 이미지 업로드
-    @PostMapping("/uploadImage/{userKey}") // 개별적으로 찾아올 때는 RequestParam 사용이 더 적합
-    public String uploadImage(@RequestParam("file") MultipartFile file, 
-                              @PathVariable("userKey") Integer userKey) {
-        // userKey로 사용자 정보를 찾는다.
+    @PostMapping("/uploadImage/{userKey}")
+    public ResponseEntity<WrapperClass<String>> uploadImage(@RequestParam("userImage") MultipartFile userImage, 
+                                                        @PathVariable("userKey") Integer userKey) {
+        String msg;
         User user = userService.findByKey(userKey);
-        
-        // 파일을 사용자 이미지로 업로드
-        userService.uploadUserImage(file, user);
-        
-        // 사용자 정보를 데이터베이스에 저장
-        userService.saveImage(user); 
-        
-        // 프로필 페이지로 리다이렉트
-        return "redirect:/mypage"; 
+        // 사용자 정보를 찾지 못한 경우
+        if (user == null) {
+            msg = "User not found";
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new WrapperClass<>(null, msg));
+        }
+        // 파일 이름 생성 및 저장 경로 설정
+        String uploadDir = new File("src/main/resources/static/images/users/").getAbsolutePath();
+        String fileName = userKey + "_user.png"; // 파일 확장자 추가
+        File destinationFile = new File(uploadDir, fileName);
+        try {
+            // 파일 저장
+            userImage.transferTo(destinationFile);
+            // 사용자 프로필 경로 설정 (상대 경로로 설정)
+            user.setUserProfile("/images/users/" + fileName); // DB에 저장할 경로 설정
+            // 사용자 정보를 데이터베이스에 저장
+            userService.saveUser(user);
+            msg = "Profile image uploaded successfully";
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new WrapperClass<>(null, msg));
+        } catch (IOException e) {
+            e.printStackTrace();
+            msg = "Failed to upload profile image";
+            return ResponseEntity // 500 : 서버에서 예상치 못한 오류가 발생했을 때
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new WrapperClass<>(null, msg));
+        }
     }
     // 회원 삭제
     // /api/users/{userKey}
@@ -206,38 +220,32 @@ public class UserController {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus status = HttpStatus.NO_CONTENT;
         UserDto updatedUserDto = null;
-
         try {
             User updatedUser = userService.findByKey(userKey);
             if (updatedUser == null) {
                 return ResponseEntity.notFound().build();
             }
-
             // 이름 업데이트
             if (userDto.getUserName() != null) {
                 updatedUser.setUserName(userDto.getUserName());
             }
-
             // 비밀번호 업데이트
             if (userDto.getUserPassword() != null) {
                 String hashedPassword = PasswordUtils.hashPassword(userDto.getUserPassword());
                 updatedUser.setUserPassword(hashedPassword);
             }
-
             // 한줄 소개 업데이트
             if (userDto.getUserContent() != null) {
                 updatedUser.setUserContent(userDto.getUserContent());
             }
-
             // 업데이트 후 저장
             updatedUser = userService.saveUser(updatedUser);
             updatedUserDto = convertToDto(updatedUser);
             status = HttpStatus.OK;
         } catch (Exception exception) {
-            status = HttpStatus.BAD_REQUEST;
+            status = HttpStatus.BAD_REQUEST; // 400 : 서버가 요청을 이해할 수 없을 때
             System.out.println("updateUser/exception = " + exception);
         }
-
         return new ResponseEntity<>(updatedUserDto, headers, status);
     }
 

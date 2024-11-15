@@ -80,4 +80,9 @@ public class User {
         this.userEmail = userEmail;
         this.userPassword = userPassword;
     }
+
+    // 이미지 업로드
+    public User(String userProfile){
+        this.userProfile = userProfile;
+    }
 }

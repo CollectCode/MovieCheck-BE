@@ -19,7 +19,7 @@ public class UserDto {
     private String userContent;     // 한줄소개
     private int userGender;
     private String userProfile;
-
+    
     public UserDto(String userEmail, String userPassword, String userName, int userGender) {
         this.userEmail = userEmail;
         this.userPassword = userPassword;
