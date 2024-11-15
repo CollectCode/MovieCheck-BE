@@ -18,11 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/users")
@@ -82,7 +84,7 @@ public class UserController {
         String hashedPassword = PasswordUtils.hashPassword(user.getUserPassword());
         user.setUserPassword(hashedPassword); // 해싱된 비밀번호로 설정
 
-        User savedUser = userService.createUser(user);
+        User savedUser = userService.saveUser(user);
         return convertToDto(savedUser);
     }
     // 회원가입 아이디 중복체크
@@ -130,7 +132,7 @@ public class UserController {
                 // 서버 메모리에서 세션 ID 확인 (필요시)
                 String sessionId = userService.getSession(userKey);
                 // 사용자 정보 가져오기
-                User user = userService.getUserByKey(userKey);
+                User user = userService.findByKey(userKey);
                 msg = "User information has been successfully retrieved.";
                 return ResponseEntity.ok(new WrapperClass<>(user, msg)); // 사용자 정보를 메시지와 함께 반환
             }
@@ -143,7 +145,7 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<WrapperClass<String>> logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
-        String msg = "";
+        String msg = "logout sucessed";
         if (session != null) {
             session.invalidate();
         }else{
@@ -168,53 +170,77 @@ public class UserController {
         // 로그아웃 후 리다이렉트
         response.setHeader("Location", "/");
         response.setStatus(HttpServletResponse.SC_FOUND);
-        msg = "logout sucessed";
         return ResponseEntity.status(HttpStatus.OK).body(new WrapperClass<>(null,msg));
+    }
+
+    // 이미지 업로드
+    @PostMapping("/uploadImage/{userKey}") // 개별적으로 찾아올 때는 RequestParam 사용이 더 적합
+    public String uploadImage(@RequestParam("file") MultipartFile file, 
+                              @PathVariable("userKey") Integer userKey) {
+        // userKey로 사용자 정보를 찾는다.
+        User user = userService.findByKey(userKey);
+        
+        // 파일을 사용자 이미지로 업로드
+        userService.uploadUserImage(file, user);
+        
+        // 사용자 정보를 데이터베이스에 저장
+        userService.saveImage(user); 
+        
+        // 프로필 페이지로 리다이렉트
+        return "redirect:/mypage"; 
     }
     // 회원 삭제
     // /api/users/{userKey}
     @DeleteMapping("/{userKey}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer userKey) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("userKey") Integer userKey) {
         if (userService.deleteUser(userKey)) {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }
     }
-    // 이름 변경
-    // /api/users/{userKey}/name
-    @PutMapping("/{userKey}/name")
-    public ResponseEntity<UserDto> updateName(@PathVariable Integer userKey, @RequestParam String newName) {
-        User updatedUser = userService.updateName(userKey, newName);
-        if (updatedUser != null) {
-            return ResponseEntity.ok(convertToDto(updatedUser));
-        } else {
-            return ResponseEntity.notFound().build();
+    // 사용자 정보 업데이트
+    // /api/users/{userKey}
+    @PutMapping("/{userKey}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable("userKey") Integer userKey, @RequestBody UserDto userDto) {
+        HttpHeaders headers = new HttpHeaders();
+        HttpStatus status = HttpStatus.NO_CONTENT;
+        UserDto updatedUserDto = null;
+
+        try {
+            User updatedUser = userService.findByKey(userKey);
+            if (updatedUser == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // 이름 업데이트
+            if (userDto.getUserName() != null) {
+                updatedUser.setUserName(userDto.getUserName());
+            }
+
+            // 비밀번호 업데이트
+            if (userDto.getUserPassword() != null) {
+                String hashedPassword = PasswordUtils.hashPassword(userDto.getUserPassword());
+                updatedUser.setUserPassword(hashedPassword);
+            }
+
+            // 한줄 소개 업데이트
+            if (userDto.getUserContent() != null) {
+                updatedUser.setUserContent(userDto.getUserContent());
+            }
+
+            // 업데이트 후 저장
+            updatedUser = userService.saveUser(updatedUser);
+            updatedUserDto = convertToDto(updatedUser);
+            status = HttpStatus.OK;
+        } catch (Exception exception) {
+            status = HttpStatus.BAD_REQUEST;
+            System.out.println("updateUser/exception = " + exception);
         }
+
+        return new ResponseEntity<>(updatedUserDto, headers, status);
     }
-    // 비밀번호 변경
-    // /api/users/{userKey}/password
-    @PutMapping("/{userKey}/password")
-    public ResponseEntity<UserDto> updatePassword(@PathVariable Integer userKey, @RequestParam String newPassword) {
-        String hashedPassword = PasswordUtils.hashPassword(newPassword); // 비밀번호 해싱
-        User updatedUser = userService.updatePassword(userKey, hashedPassword);
-        if (updatedUser != null) {
-            return ResponseEntity.ok(convertToDto(updatedUser));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-    // 한줄소개 변경
-    // /api/users/{userKey}/content
-    @PutMapping("/{userKey}/content")
-    public ResponseEntity<UserDto> updateContent(@PathVariable Integer userKey, @RequestParam String newContent) {
-        User updatedUser = userService.updateContent(userKey, newContent);
-        if (updatedUser != null) {
-            return ResponseEntity.ok(convertToDto(updatedUser));
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
     // UserDto를 User로 변환하는 메서드
     private User convertToEntity(UserDto userDto) {
         return new User(
@@ -225,7 +251,8 @@ public class UserController {
             0, // 초기 누적 좋아요
             0, // 초기 누적 싫어요
             userDto.getUserContent(),
-            userDto.getUserGender()
+            userDto.getUserGender(),
+            userDto.getUserProfile()
         );
     }
     // User를 UserDto로 변환하는 메서드
@@ -238,7 +265,8 @@ public class UserController {
             user.getUserGood(),
             user.getUserBad(),
             user.getUserContent(),
-            user.getUserGender()
+            user.getUserGender(),
+            user.getUserProfile()
         );
     }
 }

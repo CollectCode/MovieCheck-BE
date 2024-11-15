@@ -47,12 +47,15 @@ public class User {
     @Column(name = "user_gender", nullable = false)
     private int userGender;
 
+    @Column(name = "user_profile", length = 255) // 이미지 경로
+    private String userProfile;
+
     @Transient
     private String sessionId;
 
     // 성별을 인자로 받아 userKey 생성
     public User(Integer userKey,String userEmail, String userPassword, String userName,
-                int userGood,int userBad,String userContent,int userGender) {
+                int userGood,int userBad,String userContent,int userGender, String userProfile) {
         this.userKey = userKey;
         this.userEmail = userEmail;
         this.userPassword = userPassword;
@@ -61,8 +64,10 @@ public class User {
         this.userBad = userBad;
         this.userContent = userContent;
         this.userGender = userGender;
+        this.userProfile = userProfile;
     }
 
+    
     public User(String userEmail, String userPassword, String userName, int userGender) {
         this.userEmail = userEmail;
         this.userPassword = userPassword;
@@ -70,6 +75,7 @@ public class User {
         this.userGender = userGender;
     }
 
+    // 로그인
     public User(String userEmail, String userPassword){
         this.userEmail = userEmail;
         this.userPassword = userPassword;

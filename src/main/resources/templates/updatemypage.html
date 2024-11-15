@@ -3,7 +3,7 @@
 <head>
     <title>프로필 수정</title>
     <script>
-        let userKey; // 사용자 키를 전역 변수로 선언
+        let userKey; // 전역 변수 선언
 
         // 사용자 정보를 가져오는 함수
         function loadUserInfo() {
@@ -18,31 +18,14 @@
                 throw new Error('사용자 정보를 불러오는 데 실패했습니다.');
             })
             .then(user => {
-                // 사용자 정보를 입력 필드에 표시
-                document.getElementById('userName').value = user.userName;
-                document.getElementById('userContent').value = user.userContent;
-                userKey = user.userKey; // 사용자 키를 전역 변수에 저장
-            })
-            .catch(error => {
-                alert(error.message);
-            });
-        }
-
-        // 이름 변경
-        function updateName(event) {
-            event.preventDefault(); // 기본 폼 제출 방지
-
-            const userName = document.getElementById('userName').value;
-
-            fetch(`/api/users/${userKey}/name`, {
-                method: 'PUT',
-                credentials: 'include'
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('이름이 변경되었습니다.');
+                console.log('Fetched user info:', user);
+                if (user && user.userName && user.userContent) { // 필드가 있는지 확인
+                    document.getElementById('userName').value = user.userName;
+                    document.getElementById('userContent').value = user.userContent;
+                    userKey = user.userKey;
                 } else {
-                    throw new Error('이름 변경 실패');
+                    console.error("userName 또는 userContent가 응답에 포함되어 있지 않습니다.");
+                    alert("사용자 정보를 불러오는 데 문제가 발생했습니다.");
                 }
             })
             .catch(error => {
@@ -50,21 +33,29 @@
             });
         }
 
-        // 비밀번호 변경
-        function updatePassword(event) {
+        // 프로필 정보 업데이트 함수 (이름, 비밀번호, 한 줄 소개)
+        function updateUserProfile(event) {
             event.preventDefault(); // 기본 폼 제출 방지
 
-            const userPassword = document.getElementById('userPassword').value;
+            const updatedData = {
+                userName: document.getElementById('userName').value,
+                userPassword: document.getElementById('userPassword').value,
+                userContent: document.getElementById('userContent').value
+            };
 
-            fetch(`/api/users/${userKey}/password`, {
+            fetch(`/api/users/${userKey}`, {
                 method: 'PUT',
-                credentials: 'include'
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData)
             })
             .then(response => {
                 if (response.ok) {
-                    alert('비밀번호가 변경되었습니다.');
+                    alert('프로필 정보가 성공적으로 변경되었습니다.');
                 } else {
-                    throw new Error('비밀번호 변경 실패');
+                    throw new Error('프로필 정보 변경 실패');
                 }
             })
             .catch(error => {
@@ -72,21 +63,24 @@
             });
         }
 
-        // 한 줄 소개 변경
-        function updateContent(event) {
+        // 프로필 이미지 업로드
+        function uploadProfileImage(event) {
             event.preventDefault(); // 기본 폼 제출 방지
 
-            const userContent = document.getElementById('userContent').value;
+            const fileInput = document.getElementById('userProfileImage');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]); // 파일을 FormData에 추가
 
-            fetch(`/api/users/${userKey}/content`, {
+            fetch(`/api/users/${userKey}/uploadImage`, {
                 method: 'PUT',
-                credentials: 'include'
+                credentials: 'include',
+                body: formData // FormData를 요청 본문으로 전송
             })
             .then(response => {
                 if (response.ok) {
-                    alert('한 줄 소개가 변경되었습니다.');
+                    alert('프로필 사진이 변경되었습니다.');
                 } else {
-                    throw new Error('한 줄 소개 변경 실패');
+                    throw new Error('프로필 사진 변경 실패');
                 }
             })
             .catch(error => {
@@ -100,28 +94,31 @@
 </head>
 <body>
     <h1>프로필 수정</h1>
-    <form onsubmit="updateName(event)">
+    
+    <!-- 프로필 사진 업로드 폼 -->
+    <form onsubmit="uploadProfileImage(event)">
+        <div>
+            <label for="userProfileImage">프로필 사진:</label>
+            <input type="file" id="userProfileImage" accept="image/*" required>
+            <button type="submit">사진 업로드</button>
+        </div>
+    </form>
+
+    <!-- 프로필 정보 업데이트 폼 -->
+    <form onsubmit="updateUserProfile(event)">
         <div>
             <label for="userName">닉네임:</label>
             <input type="text" id="userName" required>
-            <button type="submit">이름 변경</button>
         </div>
-    </form>
-
-    <form onsubmit="updatePassword(event)">
         <div>
             <label for="userPassword">비밀번호:</label>
             <input type="password" id="userPassword" required>
-            <button type="submit">비밀번호 변경</button>
         </div>
-    </form>
-
-    <form onsubmit="updateContent(event)">
         <div>
             <label for="userContent">한 줄 소개:</label>
             <input type="text" id="userContent" required>
-            <button type="submit">한 줄 소개 변경</button>
         </div>
+        <button type="submit">프로필 정보 변경</button>
     </form>
 
     <button onclick="window.location.href='mypage.html'">뒤로가기</button>

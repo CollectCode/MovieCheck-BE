@@ -18,6 +18,7 @@ public class UserDto {
     private int userBad;           // 누적 싫어요
     private String userContent;     // 한줄소개
     private int userGender;
+    private String userProfile;
 
     public UserDto(String userEmail, String userPassword, String userName, int userGender) {
         this.userEmail = userEmail;
@@ -26,6 +27,7 @@ public class UserDto {
         this.userGender = userGender;
     }
 
+    
     public UserDto(String userEmail, String userName) {
         this.userEmail = userEmail;
         this.userName = userName;

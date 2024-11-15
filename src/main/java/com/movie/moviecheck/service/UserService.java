@@ -9,7 +9,10 @@ import lombok.RequiredArgsConstructor;
 
 // import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +28,7 @@ public class UserService {
     private static Map<String, User> nameDatabase = new HashMap<>();  // 닉네임으로 사용자 관리
 
     // 회원 생성
-    public User createUser(User user) {
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 
@@ -85,6 +88,10 @@ public class UserService {
     public User findByEmail(String userEmail) {
         return userRepository.findByUserEmail(userEmail);
     }
+    // 추가: 사용자 정보를 가져오는 메소드
+    public User findByKey(Integer userKey) {
+        return userRepository.findByUserKey(userKey);
+    }
 
     // --------------------------------------------------
 
@@ -101,8 +108,28 @@ public class UserService {
     public void removeSession(Integer userKey) {
         userSessions.remove(userKey);
     }
-    // 추가: 사용자 정보를 가져오는 메소드
-    public User getUserByKey(Integer userKey) {
-        return userRepository.findByUserKey(userKey);
+
+    // -----------------------------------------------------------
+    // image upload
+    public void uploadUserImage(MultipartFile file, User user) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                // 이미지 저장 경로 설정
+                String uploadDir = "src/main/resources/static/images/";
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                File destinationFile = new File(uploadDir + fileName);
+                file.transferTo(destinationFile); // 파일 저장
+    
+                // 사용자 객체에 이미지 경로 설정
+                user.setUserProfile(destinationFile + fileName); // 웹에서 접근할 수 있는 경로로 설정
+            } catch (IOException e) {
+                e.printStackTrace();
+                // 에러 처리 로직 추가
+            }
+        }
+    }
+    // 사용자 정보를 데이터베이스에 저장하는 로직
+    public void saveImage(User user) {
+        userRepository.save(user); 
     }
 }
