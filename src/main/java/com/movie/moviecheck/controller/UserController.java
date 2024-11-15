@@ -60,7 +60,7 @@ public class UserController {
             userService.saveSession(authenticatedUser.getUserKey(), session.getId());
             // 클라이언트에 세션 ID를 쿠키로 전달
             Cookie sessionCookie = new Cookie("SESSIONID", session.getId());
-            sessionCookie.setHttpOnly(true);
+            sessionCookie.setHttpOnly(false);
             sessionCookie.setPath("/");
             sessionCookie.setMaxAge(60 * 60); // 쿠키 유효 시간 (예: 1시간)
             response.addCookie(sessionCookie);
@@ -150,7 +150,7 @@ public class UserController {
             session.invalidate();
         }
         Cookie jsessionCookie = new Cookie("JSESSIONID", null);
-        jsessionCookie.setHttpOnly(true);
+        jsessionCookie.setHttpOnly(false);
         jsessionCookie.setPath("/");
         jsessionCookie.setMaxAge(0);
         response.addCookie(jsessionCookie);
