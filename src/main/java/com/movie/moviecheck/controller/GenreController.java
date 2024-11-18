@@ -45,9 +45,9 @@ public class GenreController {
 
     // 특정 장르 조회
     // /api/genres/{genreKey}
-    @GetMapping("/{genreKey}")
-    public ResponseEntity<Genre> getGenreById(@PathVariable String genreKey) {
-        Optional<Genre> genre = genreService.getGenreById(genreKey);
-        return genre.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
+    // @GetMapping("/{genreKey}")
+    // public ResponseEntity<Genre> getGenreById(@PathVariable String genreKey) {
+    //     Genre genre = genreService.getGenreById(genreKey);
+    //     return genre.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    // }
 }

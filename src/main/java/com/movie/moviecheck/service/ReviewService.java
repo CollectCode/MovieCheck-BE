@@ -1,14 +1,14 @@
 package com.movie.moviecheck.service;
 
-import org.springframework.stereotype.Service;
-import com.movie.moviecheck.repository.ReviewRepository;
-import com.movie.moviecheck.model.Review;
-
-
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.movie.moviecheck.model.Review;
+import com.movie.moviecheck.repository.ReviewRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

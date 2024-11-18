@@ -1,26 +1,40 @@
 package com.movie.moviecheck.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.movie.moviecheck.embedded.UserGenreId;
 
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.io.Serializable;
-
-
+@Data
 @Entity
-@Table(name = "user_genre_table")
+@Table(name = "user_genre_table") // 매핑 테이블 이름
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class UserGenre implements Serializable {
+public class UserGenre {
 
-    @Column(name = "user_key", nullable = false)
-    private Integer userKey;
+    @EmbeddedId
+    private UserGenreId id; // 복합 기본 키
 
-    @Column(name = "genre_key", nullable = false)
-    private Integer genreKey;
+    @ManyToOne
+    @MapsId("userKey") // 복합 키의 user_key를 매핑
+    @JoinColumn(name = "user_key")
+    @JsonBackReference
+    private User user; // User 엔티티와의 관계
 
-    // Getter, Setter
+    @ManyToOne
+    @MapsId("genreKey") // 복합 키의 genre_key를 매핑
+    @JoinColumn(name = "genre_key")
+    private Genre genre; // Genre 엔티티와의 관계
+
+    // 추가적인 메서드가 필요할 경우 작성
 }

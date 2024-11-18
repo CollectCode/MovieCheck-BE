@@ -1,12 +1,14 @@
 package com.movie.moviecheck.service;
-import org.springframework.stereotype.Service;
-import com.movie.moviecheck.repository.GenreRepository;
-import com.movie.moviecheck.model.Genre;
-
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.movie.moviecheck.model.Genre;
+import com.movie.moviecheck.repository.GenreRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +33,18 @@ public class GenreService {
     }
 
     // 특정 장르 조회
-    public Optional<Genre> getGenreById(String genreKey) {
-        return genreRepository.findById(genreKey);
+    public Genre getGenreById(String genreKey) {
+        Optional<Genre> og = genreRepository.findById(genreKey);
+        Genre genre;
+        if(og.isPresent())   {
+            genre = og.get();
+            return genre;
+        }
+        return og.orElseThrow(() -> new EntityNotFoundException("장르를 찾을 수 없습니다: " + genreKey));
+    }
+
+    public Optional<Genre> getGenreByName(String genrename) {
+        return genreRepository.findByGenreName(genrename);
     }
 }
 

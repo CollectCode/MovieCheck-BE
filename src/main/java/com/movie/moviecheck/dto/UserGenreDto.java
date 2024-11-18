@@ -9,11 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GenreDto {
+public class UserGenreDto {
+    private Integer userKey;
     private String genreKey;
-    private String genreName;
-
-    public GenreDto(String genreName) {
-        this.genreName = genreName;
-    }
 }

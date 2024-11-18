@@ -10,15 +10,17 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-    private int userKey;       // 회원번호
-    private String userEmail;     // 회원 이메일
+    
+    private Integer userKey;       // 회원번호
+    private String userEmail;      // 회원 이메일
     private String userPassword;   // 회원 비밀번호
-    private String userName;           // 사용자 이름 (닉네임)
+    private String userName;       // 사용자 이름 (닉네임)
     private int userGood;          // 누적 좋아요
     private int userBad;           // 누적 싫어요
-    private String userContent;     // 한줄소개
+    private String userContent;    // 한줄소개
     private int userGender;
     private String userProfile;
+    private String userGrade;
     
     public UserDto(String userEmail, String userPassword, String userName, int userGender) {
         this.userEmail = userEmail;

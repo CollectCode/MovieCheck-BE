@@ -1,8 +1,11 @@
 package com.movie.moviecheck.model;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,4 +26,7 @@ public class Genre {
 
     @Column(name = "genre_name", length = 20)
     private String genreName;
+
+    @OneToMany(mappedBy = "genre")
+    private List<UserGenre> userGenres;
 }

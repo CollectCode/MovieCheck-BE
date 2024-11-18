@@ -1,16 +1,21 @@
 package com.movie.moviecheck.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 
 @Entity
 @Table(name = "users_table")
@@ -49,6 +54,10 @@ public class User {
 
     @Column(name = "user_profile", length = 255) // 이미지 경로
     private String userProfile;
+
+    @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<UserGenre> userGenre;
 
     @Transient
     private String sessionId;

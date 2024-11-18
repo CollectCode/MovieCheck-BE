@@ -1,7 +1,5 @@
 package com.movie.moviecheck.repository;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.movie.moviecheck.model.User;
@@ -12,8 +10,6 @@ public interface UserRepository extends JpaRepository<User,Integer>  {
     boolean existsByUserName(String userName);
     
     User findByUserEmailAndUserPassword(String userEmail, String userPassword);
-
     User findByUserEmail(String userEmail);
-
     User findByUserKey(Integer userKey);
 }
