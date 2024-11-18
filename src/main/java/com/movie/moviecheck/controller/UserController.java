@@ -82,40 +82,8 @@ public class UserController {
     }
 
     // 이미지 업로드(추후 리팩토링)
-    @PostMapping("/uploadImage/{userKey}")
-    public ResponseEntity<WrapperClass<String>> uploadImage(@RequestParam("userImage") MultipartFile userImage, 
-                                                        @PathVariable("userKey") Integer userKey) {
-        String msg;
-        UserDto userDto = userConvertor.convertToDto(userService.findByKey(userKey));
-        User user = userConvertor.convertToEntity(userDto);
-        // 사용자 정보를 찾지 못한 경우
-        if (user == null) {
-            msg = "User not found";
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new WrapperClass<>(null, msg));
-        }
-        // 파일 이름 생성 및 저장 경로 설정
-        String uploadDir = new File("src/main/resources/static/images/users/").getAbsolutePath();
-        String fileName = userKey + "_user.png"; // 파일 확장자 추가
-        File destinationFile = new File(uploadDir, fileName);
-        try {
-            // 파일 저장
-            userImage.transferTo(destinationFile);
-            // 사용자 프로필 경로 설정 (상대 경로로 설정)
-            user.setUserProfile("/images/users/" + fileName); // DB에 저장할 경로 설정
-            // 사용자 정보를 데이터베이스에 저장
-            userService.saveUser(user);
-            msg = "Profile image uploaded successfully";
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(null, msg));
-        } catch (IOException e) {
-            e.printStackTrace();
-            msg = "Failed to upload profile image";
-            return ResponseEntity // 500 : 서버에서 예상치 못한 오류가 발생했을 때
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new WrapperClass<>(null, msg));
-        }
+    @PostMapping("/uploadImage")
+    public ResponseEntity<WrapperClass<UserDto>> goToUpLoadImage(@RequestParam("userImage") MultipartFile userImage, HttpServletRequest request) {
+        return userService.uploadImage(request, userImage);
     }
 }

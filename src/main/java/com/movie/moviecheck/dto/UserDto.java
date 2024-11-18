@@ -22,7 +22,7 @@ public class UserDto {
     private String userContent;    // 한줄소개
     private int userGender;
     private String userProfile;
-    private String userGrade;
+    private String userGrade = "관람객";
     
     public UserDto(String userEmail, String userPassword, String userName, int userGender) {
         this.userEmail = userEmail;

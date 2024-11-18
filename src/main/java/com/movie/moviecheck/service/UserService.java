@@ -5,11 +5,14 @@ import java.io.IOException; // User 모델 클래스 필요
 import java.util.HashMap; // UserRepository 필요
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.movie.moviecheck.controller.WrapperClass;
@@ -219,7 +222,7 @@ public class UserService {
                         .status(status)
                         .body(new WrapperClass<>(userDto, msg));
             }
-            // 이름 업데이트
+            // 이름 및 소개 업데이트
             else if ((userDto.getUserName() != null)) {
                 user.setUserName(userDto.getUserName());
                 user.setUserContent(userDto.getUserContent());
@@ -237,6 +240,45 @@ public class UserService {
             return ResponseEntity
                     .status(status)
                     .body(new WrapperClass<>(userDto, msg));
+        }
+    }
+
+    // 업로드 이미지 세팅로직
+    public ResponseEntity<WrapperClass<UserDto>> uploadImage(HttpServletRequest request, MultipartFile userImage) {
+        HttpSession session = request.getSession(false);
+        Integer userKey = (Integer) session.getAttribute("userKey");
+        String msg = "업로드 실패";
+        User user = findByKey(userKey);
+        UserDto userDto = null;
+        if (user != null) {
+            if (userImage != null && !userImage.isEmpty()) {
+                String uploadDir = new File("src/main/resources/static/images/users/").getAbsolutePath(); // 절대 경로로 변경
+                String fileName = "user_" + user.getUserKey() + ".png"; // UUID 추가
+                File destinationFile = new File(uploadDir, fileName);
+                try {
+                    userImage.transferTo(destinationFile);
+                    user.setUserProfile("/images/users/" + fileName);
+                    saveUser(user);
+                    msg = "이미지 업로드 성공";
+                    userDto = userConvertor.convertToDto(user);
+                    return ResponseEntity.status(HttpStatus.OK)
+                                        .body(new WrapperClass<>(userDto, msg));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    msg = "파일 저장 중 오류 발생";
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                        .body(new WrapperClass<>(userDto, msg));
+                }
+            } else {
+                msg = "이미지가 존재하지 않거나 비어 있습니다.";
+                userDto = userConvertor.convertToDto(user);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                    .body(new WrapperClass<>(userDto, msg));
+            }
+        } else {
+            msg = "사용자가 존재하지 않습니다.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(new WrapperClass<>(userDto, msg));
         }
     }
 
@@ -312,44 +354,19 @@ public class UserService {
         return userRepository.findByUserKey(userKey);
     }
 
-    // --------------------------------------------------
-
-    private final ConcurrentHashMap<Integer, String> userSessions = new ConcurrentHashMap<>();
-
-    public void saveSession(Integer userKey, String sessionId) {
-        userSessions.put(userKey, sessionId);
-    }
-
-    public String getSession(Integer userKey) {
-        return userSessions.get(userKey);
-    }
-
-    public void removeSession(Integer userKey) {
-        userSessions.remove(userKey);
-    }
-
-    // -----------------------------------------------------------
-    // image upload
-    public void uploadUserImage(MultipartFile file, User user) {
-        if (file != null && !file.isEmpty()) {
-            try {
-                // 이미지 저장 경로 설정
-                String uploadDir = "src/main/resources/static/images/";
-                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-                File destinationFile = new File(uploadDir + fileName);
-                file.transferTo(destinationFile); // 파일 저장
-
-                // 사용자 객체에 이미지 경로 설정
-                user.setUserProfile(destinationFile + fileName); // 웹에서 접근할 수 있는 경로로 설정
-            } catch (IOException e) {
-                e.printStackTrace();
-                // 에러 처리 로직 추가
-            }
-        }
-    }
-
     // 사용자 정보를 데이터베이스에 저장하는 로직
     public void saveImage(User user) {
         userRepository.save(user);
+    }
+    
+    private final ConcurrentHashMap<Integer, String> userSessions = new ConcurrentHashMap<>();
+    public void saveSession(Integer userKey, String sessionId) {
+        userSessions.put(userKey, sessionId);
+    }
+    public String getSession(Integer userKey) {
+        return userSessions.get(userKey);
+    }
+    public void removeSession(Integer userKey) {
+        userSessions.remove(userKey);
     }
 }
