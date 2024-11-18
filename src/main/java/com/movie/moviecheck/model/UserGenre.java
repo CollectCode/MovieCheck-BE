@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import lombok.Setter;
 @Data
 @Entity
 @Table(name = "user_genre_table") // 매핑 테이블 이름
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserGenre {

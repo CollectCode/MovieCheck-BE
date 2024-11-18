@@ -88,7 +88,7 @@ public class UserGenreService {
                 } else {
                     msg = "장르 '" + genre.getGenreName() + "' 를 찾을 수 없습니다.";
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                        .body(new WrapperClass<>(null, msg));
+                                        .body(new WrapperClass<>(genreDtos, msg));
                 }
                 if (setUserGenres(user, genre)) {
                     GenreDto newDto = new GenreDto();
@@ -101,7 +101,7 @@ public class UserGenreService {
                                     .body(new WrapperClass<>(genreDtos, msg));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                                .body(new WrapperClass<>(null, msg));
+                                .body(new WrapperClass<>(genreDtos, msg));
     }
 
     // 유저가 설정한 장르 적용하기

@@ -33,20 +33,20 @@ public class UserService {
     private final UserConvertor userConvertor;
 
     private static Map<String, User> userDatabase = new HashMap<>(); // 이메일로 사용자 관리
-    private static Map<String, User> nameDatabase = new HashMap<>();  // 닉네임으로 사용자 관리
+    private static Map<String, User> nameDatabase = new HashMap<>(); // 닉네임으로 사용자 관리
 
     // 로그인 로직
     public ResponseEntity<WrapperClass<UserDto>> login(
-        UserDto userDto, HttpServletRequest request, HttpServletResponse response) {
+            UserDto userDto, HttpServletRequest request, HttpServletResponse response) {
         String msg = "";
         User user = userConvertor.convertToEntity(userDto);
-        
+
         // 이메일 존재 여부 확인
         if (!isEmailExists(user.getUserEmail())) {
             msg = "등록되지 않은 이메일입니다.";
             return ResponseEntity // 404 : 요청한 리소스를 찾을 수 없을 때
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new WrapperClass<>(userDto,msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
+                    .body(new WrapperClass<>(userDto, msg)); // 이메일이 존재하지 않을 경우 에러 메시지 반환
         }
 
         // 입력한 비밀번호 해싱
@@ -70,20 +70,20 @@ public class UserService {
             msg = "로그인 성공";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(userDto,msg)); // 로그인 성공 메시지 반환
+                    .body(new WrapperClass<>(userDto, msg)); // 로그인 성공 메시지 반환
         } else {
             msg = "비밀번호가 일치하지 않습니다.";
             return ResponseEntity// 401 : 인증이 필요한 요청이지만, 인증 정보가 없거나 잘못되었을 때
-                    .status(HttpStatus.UNAUTHORIZED) 
-                    .body(new WrapperClass<>(userDto,msg)); // 로그인 실패 메시지 반환
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new WrapperClass<>(userDto, msg)); // 로그인 실패 메시지 반환
         }
     }
-    
+
     // 회원가입 로직
     public ResponseEntity<WrapperClass<UserDto>> createUser(UserDto userDto) {
         String msg = "회원가입 성공";
         User user = userConvertor.convertToEntity(userDto);
-        
+
         // 비밀번호 해싱
         String hashedPassword = PasswordUtils.hashPassword(user.getUserPassword());
         user.setUserPassword(hashedPassword); // 해싱된 비밀번호로 설정
@@ -91,55 +91,53 @@ public class UserService {
         // 유저저장
         User savedUser = saveUser(user);
 
-        // DB에 저장이 안되었을때 
-        if(savedUser == null)  {
+        // DB에 저장이 안되었을때
+        if (savedUser == null) {
             msg = "사용자 저장에 실패했습니다. 다시 시도해주세요.";
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body(new WrapperClass<>(null,msg));
+                    .body(new WrapperClass<>(null, msg));
         }
 
         // 회원가입이 성공적으로 되었을때
         UserDto sendUser = userConvertor.convertToDto(savedUser);
         return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(sendUser,msg));
+                .status(HttpStatus.OK)
+                .body(new WrapperClass<>(sendUser, msg));
     }
 
     // 이메일 중복체크 로직
-    public ResponseEntity<WrapperClass<UserDto>> emailCheck(UserDto userDto)   {
+    public ResponseEntity<WrapperClass<UserDto>> emailCheck(UserDto userDto) {
         String msg = "이미 가입되어있는 이메일 입니다.";
         if (!isEmailExists(userDto.getUserEmail())) {
             msg = "사용가능한 이메일 입니다.";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(userDto,msg));
-        }
-        else{
+                    .body(new WrapperClass<>(userDto, msg));
+        } else {
             return ResponseEntity
-            .status(HttpStatus.CONFLICT) // 409 : 요청이 현재 서버 상태와 충돌할 때
-            .body(new WrapperClass<>(userDto,msg)); // 이메일이 존재 할 때
+                    .status(HttpStatus.CONFLICT) // 409 : 요청이 현재 서버 상태와 충돌할 때
+                    .body(new WrapperClass<>(userDto, msg)); // 이메일이 존재 할 때
         }
     }
 
     // 닉네임 중복체크 로직
-    public ResponseEntity<WrapperClass<UserDto>> isNameExist(UserDto userDto)  {
+    public ResponseEntity<WrapperClass<UserDto>> isNameExist(UserDto userDto) {
         String msg = "중복된 닉네임 입니다.";
         if (!isNameExists(userDto.getUserName())) {
             msg = "사용 가능한 닉네임 입니다.";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(userDto,msg));
-        }
-        else{
+                    .body(new WrapperClass<>(userDto, msg));
+        } else {
             return ResponseEntity
-            .status(HttpStatus.CONFLICT) // 409 : 요청이 현재 서버 상태와 충돌할 때
-            .body(new WrapperClass<>(userDto,msg)); // 닉네임이 존재 할 때
+                    .status(HttpStatus.CONFLICT) // 409 : 요청이 현재 서버 상태와 충돌할 때
+                    .body(new WrapperClass<>(userDto, msg)); // 닉네임이 존재 할 때
         }
     }
 
     // 마이페이지를 가져오는 로직
-    public ResponseEntity<WrapperClass<UserDto>> getMyPage(HttpServletRequest request)   {
+    public ResponseEntity<WrapperClass<UserDto>> getMyPage(HttpServletRequest request) {
         HttpSession session = request.getSession(false); // 기존 세션을 가져옴
         String msg = "";
         if (session != null) {
@@ -154,11 +152,12 @@ public class UserService {
             }
         }
         msg = "세션이 유효하지 않습니다."; // 403 : 서버가 요청을 이해했지만, 접근을 거부했을 때
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new WrapperClass<>(null, msg)); // 세션이 없거나 유효하지 않으면 401 반환
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new WrapperClass<>(null, msg)); // 세션이 없거나 유효하지 않으면 401
+                                                                                                // 반환
     }
 
     // 로그아웃을 진행하는 로직
-    public ResponseEntity<WrapperClass<UserDto>> logout(HttpServletRequest request, HttpServletResponse response)    {
+    public ResponseEntity<WrapperClass<UserDto>> logout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession(false);
         Integer userKey = (Integer) session.getAttribute("userKey");
         UserDto userDto = userConvertor.convertToDto(findByKey(userKey));
@@ -181,11 +180,11 @@ public class UserService {
         // 로그아웃 후 리다이렉트
         response.setHeader("Location", "/");
         response.setStatus(HttpServletResponse.SC_FOUND);
-        return ResponseEntity.status(HttpStatus.OK).body(new WrapperClass<>(userDto,msg));
+        return ResponseEntity.status(HttpStatus.OK).body(new WrapperClass<>(userDto, msg));
     }
 
     // 회원 탈퇴 로직
-    public ResponseEntity<WrapperClass<UserDto>> deleteUser(HttpServletRequest request)  {
+    public ResponseEntity<WrapperClass<UserDto>> deleteUser(HttpServletRequest request) {
         HttpSession session = request.getSession();
         Integer userKey = (Integer) session.getAttribute("userKey");
         UserDto userDto = userConvertor.convertToDto(findByKey(userKey));
@@ -210,21 +209,20 @@ public class UserService {
         HttpSession session = request.getSession(false);
         HttpStatus status = HttpStatus.NOT_FOUND;
         Integer userKey = (Integer) session.getAttribute("userKey");
-        UserDto updatedUser = null;
         String msg = "마이페이지 변경 완료";
         try {
-            updatedUser = userConvertor.convertToDto(findByKey(userKey));
-            User user = userConvertor.convertToEntity(updatedUser);
-            if (updatedUser == null) {
+            User user = findByKey(userKey);
+            UserDto updatedUser = null;
+            if (user == null) {
                 msg = "사용자를 찾을 수 없습니다.";
                 return ResponseEntity
-                    .status(status)
-                    .body(new WrapperClass<>(userDto, msg));
+                        .status(status)
+                        .body(new WrapperClass<>(userDto, msg));
             }
             // 이름 업데이트
-            else if ((userDto.getUserName() != null) && (userDto.getUserContent() != null)) {
-                updatedUser.setUserName(userDto.getUserName());
-                updatedUser.setUserContent(userDto.getUserContent());
+            else if ((userDto.getUserName() != null)) {
+                user.setUserName(userDto.getUserName());
+                user.setUserContent(userDto.getUserContent());
             }
             // 업데이트 후 저장
             user = saveUser(user);
@@ -234,15 +232,15 @@ public class UserService {
                     .status(status)
                     .body(new WrapperClass<>(updatedUser, msg));
         } catch (Exception exception) {
-            msg = "마이페이지 변경 실패..";
+            msg = exception.getMessage();
             status = HttpStatus.BAD_REQUEST; // 400 : 서버가 요청을 이해할 수 없을 때
             return ResponseEntity
                     .status(status)
-                    .body(new WrapperClass<>(updatedUser, msg));
+                    .body(new WrapperClass<>(userDto, msg));
         }
     }
 
-    // 회원 생성
+    // 회원 생성 및 갱신
     public User saveUser(User user) {
         return userRepository.save(user);
     }
@@ -262,7 +260,7 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setUserName(newName); // 이름 변경
-            return userRepository.save(user);
+            return saveUser(user);
         }
         return null;
     }
@@ -273,7 +271,7 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setUserPassword(newPassword);
-            return userRepository.save(user);
+            return saveUser(user);
         }
         return null;
     }
@@ -284,7 +282,7 @@ public class UserService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             user.setUserContent(newContent);
-            return userRepository.save(user);
+            return saveUser(user);
         }
         return null;
     }
@@ -340,7 +338,7 @@ public class UserService {
                 String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
                 File destinationFile = new File(uploadDir + fileName);
                 file.transferTo(destinationFile); // 파일 저장
-    
+
                 // 사용자 객체에 이미지 경로 설정
                 user.setUserProfile(destinationFile + fileName); // 웹에서 접근할 수 있는 경로로 설정
             } catch (IOException e) {
@@ -349,8 +347,9 @@ public class UserService {
             }
         }
     }
+
     // 사용자 정보를 데이터베이스에 저장하는 로직
     public void saveImage(User user) {
-        userRepository.save(user); 
+        userRepository.save(user);
     }
 }

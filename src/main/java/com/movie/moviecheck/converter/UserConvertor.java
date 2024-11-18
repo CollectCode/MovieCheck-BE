@@ -13,17 +13,16 @@ public class UserConvertor {
         if (userDto == null) {
             return null; // null 체크
         }
-        return new User(
-            userDto.getUserKey(),
-            userDto.getUserEmail(),
-            userDto.getUserPassword(),
-            userDto.getUserName(),
-            0, // 초기 누적 좋아요
-            0, // 초기 누적 싫어요
-            userDto.getUserContent(),
-            userDto.getUserGender(),
-            userDto.getUserProfile()
-        );
+        return User.builder()
+                   .userKey(userDto.getUserKey())
+                   .userEmail(userDto.getUserEmail())
+                   .userPassword(userDto.getUserPassword())
+                   .userName(userDto.getUserName())
+                   .userContent(userDto.getUserContent())
+                   .userGender(userDto.getUserGender())
+                   .userProfile(userDto.getUserProfile())
+                   .userGrade(userDto.getUserGrade())
+                   .build();
     }
 
     // User를 UserDto로 변환하는 메서드
@@ -31,18 +30,16 @@ public class UserConvertor {
         if (user == null) {
             return null; // null 체크
         }
-        return new UserDto(
-            user.getUserKey(),
-            user.getUserEmail(),
-            user.getUserPassword(),
-            user.getUserName(),
-            user.getUserGood(),
-            user.getUserBad(),
-            user.getUserContent(),
-            user.getUserGender(),
-            user.getUserProfile(),
-            user.getUserGrade()
-        );
+        return UserDto.builder()
+                   .userKey(user.getUserKey())
+                   .userEmail(user.getUserEmail())
+                   .userPassword(user.getUserPassword())
+                   .userName(user.getUserName())
+                   .userContent(user.getUserContent())
+                   .userGender(user.getUserGender())
+                   .userProfile(user.getUserProfile())
+                   .userGrade(user.getUserGrade())
+                   .build();
     }
 }
 
