@@ -207,7 +207,7 @@ public class UserService {
 
     // 마이페이지 수정 로직
     public ResponseEntity<WrapperClass<UserDto>> updateUser(HttpServletRequest request, UserDto userDto) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         HttpStatus status = HttpStatus.NOT_FOUND;
         Integer userKey = (Integer) session.getAttribute("userKey");
         UserDto updatedUser = null;
