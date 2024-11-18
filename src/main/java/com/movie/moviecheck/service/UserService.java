@@ -1,16 +1,22 @@
 package com.movie.moviecheck.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException; // User 모델 클래스 필요
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.HashMap; // UserRepository 필요
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -279,6 +285,39 @@ public class UserService {
             msg = "사용자가 존재하지 않습니다.";
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                                 .body(new WrapperClass<>(userDto, msg));
+        }
+    }
+
+    // 이미지를 반환하는 메서드
+    public ResponseEntity<Resource> getUserImage(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        Integer userKey = (Integer) session.getAttribute("userKey");
+
+        // 세션 확인
+        if (session == null || userKey == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = findByKey(userKey);
+        // 사용자와 프로필 확인
+        if (user == null || user.getUserProfile() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        try {
+            // 이미지 파일 경로 설정
+            String imagePath = new File("src/main/resources/static" + user.getUserProfile()).getAbsolutePath();
+            File imageFile = new File(imagePath);
+
+            if (!imageFile.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            // 이미지 리소스 반환
+            Resource resource = new InputStreamResource(new FileInputStream(imageFile));
+            return ResponseEntity.ok()
+                    .header("Content-Type", "image/png") // PNG 타입
+                    .body(resource);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

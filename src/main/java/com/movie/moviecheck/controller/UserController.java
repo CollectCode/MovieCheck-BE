@@ -3,6 +3,7 @@ package com.movie.moviecheck.controller;
 import java.io.File;
 import java.io.IOException;
 
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity; // User 모델 클래스 필요
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -81,9 +82,16 @@ public class UserController {
         return userService.updateUser(request, userDto);
     }
 
-    // 이미지 업로드(추후 리팩토링)
+    // 이미지 업로드
     @PostMapping("/uploadImage")
     public ResponseEntity<WrapperClass<UserDto>> goToUpLoadImage(@RequestParam("userImage") MultipartFile userImage, HttpServletRequest request) {
         return userService.uploadImage(request, userImage);
     }
+
+    // 이미지 반환
+    @GetMapping("/getUserImage")
+    public ResponseEntity<Resource> goToUserImage(HttpServletRequest request) {
+        return userService.getUserImage(request);
+    }
+
 }
