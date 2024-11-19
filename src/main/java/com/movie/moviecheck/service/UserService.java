@@ -289,37 +289,82 @@ public class UserService {
     }
 
     // 이미지를 반환하는 메서드
-    public ResponseEntity<Resource> getUserImage(HttpServletRequest request) {
+    public ResponseEntity<WrapperClass<String>> getUserImage(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(401)
+                    .body(new WrapperClass<>(null, "세션이 없습니다."));
+        }
+
         Integer userKey = (Integer) session.getAttribute("userKey");
-
-        // 세션 확인
-        if (session == null || userKey == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        if (userKey == null) {
+            return ResponseEntity.status(401)
+                    .body(new WrapperClass<>(null, "유효한 사용자 키가 없습니다."));
         }
+
+        // 사용자 조회
         User user = findByKey(userKey);
-        // 사용자와 프로필 확인
-        if (user == null || user.getUserProfile() == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (user == null) {
+            return ResponseEntity.status(404)
+                    .body(new WrapperClass<>(null, "사용자 또는 프로필 이미지가 없습니다."));
         }
-        try {
-            // 이미지 파일 경로 설정
-            String imagePath = new File("src/main/resources/static" + user.getUserProfile()).getAbsolutePath();
-            File imageFile = new File(imagePath);
 
-            if (!imageFile.exists()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            // 이미지 리소스 반환
-            Resource resource = new InputStreamResource(new FileInputStream(imageFile));
+        // 이미지 파일 경로
+        String imagePath = new File("src/main/resources/static" + user.getUserProfile()).getAbsolutePath();
+        File imageFile = new File(imagePath);
+
+        if (!imageFile.exists()) {
+            return ResponseEntity.status(404)
+                    .body(new WrapperClass<>(null, "이미지 파일이 존재하지 않습니다."));
+        }
+
+        try {
+            // 이미지 파일을 Base64로 변환
+            byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
             return ResponseEntity.ok()
-                    .header("Content-Type", "image/png") // PNG 타입
-                    .body(resource);
+                    .body(new WrapperClass<>(base64Image, "이미지 변환 성공"));
+
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(500)
+                    .body(new WrapperClass<>(null, "이미지 처리 중 오류가 발생했습니다."));
         }
     }
+
+    // // 이미지를 반환하는 메서드
+    // public ResponseEntity<Resource> getUserImage(HttpServletRequest request) {
+    //     HttpSession session = request.getSession(false);
+    //     Integer userKey = (Integer) session.getAttribute("userKey");
+
+    //     // 세션 확인
+    //     if (session == null || userKey == null) {
+    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    //     }
+    //     User user = findByKey(userKey);
+    //     // 사용자와 프로필 확인
+    //     if (user == null || user.getUserProfile() == null) {
+    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    //     }
+    //     try {
+    //         // 이미지 파일 경로 설정
+    //         String imagePath = new File("src/main/resources/static" + user.getUserProfile()).getAbsolutePath();
+    //         File imageFile = new File(imagePath);
+
+    //         if (!imageFile.exists()) {
+    //             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    //         }
+    //         // 이미지 리소스 반환
+    //         Resource resource = new InputStreamResource(new FileInputStream(imageFile));
+    //         return ResponseEntity.ok()
+    //                 .header("Content-Type", "image/png") // PNG 타입
+    //                 .body(resource);
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    //     }
+    // }
 
     // 회원 생성 및 갱신
     public User saveUser(User user) {

@@ -90,7 +90,7 @@ public class UserController {
 
     // 이미지 반환
     @GetMapping("/getUserImage")
-    public ResponseEntity<Resource> goToUserImage(HttpServletRequest request) {
+    public ResponseEntity<WrapperClass<String>> goToUserImage(HttpServletRequest request) {
         return userService.getUserImage(request);
     }
 
