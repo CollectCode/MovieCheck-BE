@@ -83,13 +83,13 @@ public class UserController {
     }
 
     // 이미지 업로드
-    @PostMapping("/uploadImage")
+    @PostMapping("/uploadimage")
     public ResponseEntity<WrapperClass<UserDto>> goToUpLoadImage(@RequestParam("userImage") MultipartFile userImage, HttpServletRequest request) {
         return userService.uploadImage(request, userImage);
     }
 
     // 이미지 반환
-    @GetMapping("/getUserImage")
+    @GetMapping("/getuserimage")
     public ResponseEntity<WrapperClass<String>> goToUserImage(HttpServletRequest request) {
         return userService.getUserImage(request);
     }
