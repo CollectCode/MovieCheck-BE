@@ -333,39 +333,6 @@ public class UserService {
         }
     }
 
-    // // 이미지를 반환하는 메서드
-    // public ResponseEntity<Resource> getUserImage(HttpServletRequest request) {
-    //     HttpSession session = request.getSession(false);
-    //     Integer userKey = (Integer) session.getAttribute("userKey");
-
-    //     // 세션 확인
-    //     if (session == null || userKey == null) {
-    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    //     }
-    //     User user = findByKey(userKey);
-    //     // 사용자와 프로필 확인
-    //     if (user == null || user.getUserProfile() == null) {
-    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    //     }
-    //     try {
-    //         // 이미지 파일 경로 설정
-    //         String imagePath = new File("src/main/resources/static" + user.getUserProfile()).getAbsolutePath();
-    //         File imageFile = new File(imagePath);
-
-    //         if (!imageFile.exists()) {
-    //             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    //         }
-    //         // 이미지 리소스 반환
-    //         Resource resource = new InputStreamResource(new FileInputStream(imageFile));
-    //         return ResponseEntity.ok()
-    //                 .header("Content-Type", "image/png") // PNG 타입
-    //                 .body(resource);
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    //     }
-    // }
-
     // 회원 생성 및 갱신
     public User saveUser(User user) {
         return userRepository.save(user);

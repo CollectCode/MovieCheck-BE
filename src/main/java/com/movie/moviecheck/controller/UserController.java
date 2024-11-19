@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.movie.moviecheck.converter.UserConvertor;
 import com.movie.moviecheck.dto.UserDto;
-import com.movie.moviecheck.model.User;
 import com.movie.moviecheck.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
