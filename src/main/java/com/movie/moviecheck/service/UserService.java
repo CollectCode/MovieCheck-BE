@@ -175,13 +175,11 @@ public class UserService {
             session.invalidate();
         }
         Cookie jsessionCookie = new Cookie("JSESSIONID", null);
-        jsessionCookie.setHttpOnly(false);
         jsessionCookie.setPath("/");
         jsessionCookie.setMaxAge(0);
         response.addCookie(jsessionCookie);
 
         Cookie sessionCookie = new Cookie("SESSIONID", null);
-        sessionCookie.setHttpOnly(false);
         sessionCookie.setPath("/");
         sessionCookie.setMaxAge(0);
         response.addCookie(sessionCookie);
@@ -207,13 +205,11 @@ public class UserService {
             session.invalidate();
         }
         Cookie jsessionCookie = new Cookie("JSESSIONID", null);
-        jsessionCookie.setHttpOnly(false);
         jsessionCookie.setPath("/");
         jsessionCookie.setMaxAge(0);
         response.addCookie(jsessionCookie);
 
         Cookie sessionCookie = new Cookie("SESSIONID", null);
-        sessionCookie.setHttpOnly(false);
         sessionCookie.setPath("/");
         sessionCookie.setMaxAge(0);
         response.addCookie(sessionCookie);
