@@ -40,13 +40,6 @@ public class MovieController {
         }
     }
 
-    // 영화 추가
-    // /api/movies/create
-    @PostMapping("/create")
-    public MovieDto goTocreateMovie(@RequestBody MovieDto movieDto) {
-        return movieService.createMovie(movieDto);
-    }
-    
     // 영화 삭제
     // /api/movies/{id}
     @DeleteMapping("/delete")

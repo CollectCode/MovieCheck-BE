@@ -193,7 +193,7 @@ public class UserService {
     }
 
     // 회원 탈퇴 로직
-    public ResponseEntity<WrapperClass<UserDto>> deleteUser(HttpServletRequest request) {
+    public ResponseEntity<WrapperClass<UserDto>> deleteUser(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
         Integer userKey = (Integer) session.getAttribute("userKey");
         UserDto userDto = userConvertor.convertToDto(findByKey(userKey));
@@ -202,6 +202,21 @@ public class UserService {
 
         if (deleteUser(user)) {
             msg = "회원탈퇴에 성공했습니다.";
+            
+        if (session != null) {
+            session.invalidate();
+        }
+        Cookie jsessionCookie = new Cookie("JSESSIONID", null);
+        jsessionCookie.setHttpOnly(false);
+        jsessionCookie.setPath("/");
+        jsessionCookie.setMaxAge(0);
+        response.addCookie(jsessionCookie);
+
+        Cookie sessionCookie = new Cookie("SESSIONID", null);
+        sessionCookie.setHttpOnly(false);
+        sessionCookie.setPath("/");
+        sessionCookie.setMaxAge(0);
+        response.addCookie(sessionCookie);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(new WrapperClass<>(userDto, msg));

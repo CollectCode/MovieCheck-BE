@@ -71,8 +71,8 @@ public class UserController {
 
     // 회원 삭제
     @DeleteMapping("/delete")
-    public ResponseEntity<WrapperClass<UserDto>> goToDeleteUser(HttpServletRequest request) {
-        return userService.deleteUser(request);
+    public ResponseEntity<WrapperClass<UserDto>> goToDeleteUser(HttpServletRequest request, HttpServletResponse response) {
+        return userService.deleteUser(request,response);
     }
 
     // 회원 정보 갱신
