@@ -25,11 +25,11 @@ public class MovieGenreConvertor {
 
     public MovieGenre convertToEntity(MovieGenreDto movieGenreDto){
         MovieGenreId movieGenreId = new MovieGenreId(movieGenreDto.getMovieKey(), movieGenreDto.getGenreKey());
-        Movie movie = movieService.getMovieByMovieKey(movieGenreDto.getMovieKey());
+        // Movie movie = movieService.getMovieByMovieKey(movieGenreDto.getMovieKey());
         Genre genre = genreService.getGenreById(movieGenreDto.getGenreKey());
         return MovieGenre.builder()
                          .id(movieGenreId)
-                         .movie(movie)
+                        //  .movie(movie)
                          .genre(genre)
                          .build();
     }

@@ -4,8 +4,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.movie.moviecheck.service.ReviewService;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+import com.movie.moviecheck.dto.ReviewDto;
+import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 
 import java.util.List;
@@ -13,23 +17,21 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 public class ReviewController {
 
     
     private final ReviewService reviewService;
 
     // 리뷰 추가
-    ///api/reviews/create
-    @PostMapping("/create")
-    public ResponseEntity<Review> addReview(@RequestBody Review review) {
-        Review savedReview = reviewService.addReview(review);
-        return ResponseEntity.ok(savedReview);
-    }
+    // @PostMapping("/create")
+    // public ResponseEntity<ReviewDto> goToAddReview(@RequestBody ReviewDto reviewDto,Movie movie, HttpServletRequest request) {
+    //     return reviewService.addReview(reviewDto,movie,request);
+    // }
     
     // 리뷰 삭제
     // /api/reviews/{reviewKey}
-    @DeleteMapping("/{reviewKey}")
+    @DeleteMapping("/delete")
     public ResponseEntity<Void> deleteReview(@PathVariable Integer reviewKey) {
         reviewService.deleteReview(reviewKey);
         return ResponseEntity.noContent().build();

@@ -5,6 +5,9 @@ import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.service.MovieService; // 서비스 클래스 필요
 import com.movie.moviecheck.converter.MovieConvertor;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,24 +23,17 @@ public class MovieController {
     private final MovieService movieService; // MovieService 주입
     private final MovieConvertor movieConvertor;
 
-    // 모든 영화 목록 조회
-    // /api/movies
+    // 영화 정보 가져오기
     @GetMapping
-    public List<MovieDto> getAllMovies() {
-        return movieService.getAllMovies().stream()
-                .map(movie -> movieConvertor.convertToDto(movie)) // 람다 표현식 사용
-                .collect(Collectors.toList());
+    public List<MovieDto> goTogetAllMovies() {
+        return movieService.getAllMovies();  // 이미 MovieDto 리스트가 반환되는 경우
     }
+
     // 특정 영화 조회
-    // /api/movies/search
-    @GetMapping("/search")
-    public ResponseEntity<MovieDto> getMovieById(@PathVariable String movieKey) {
-        Movie movie = movieService.getMovieByMovieKey(movieKey);
-        if (movie != null) {
-            return ResponseEntity.ok(movieConvertor.convertToDto(movie)); // Movie를 MovieDto로 변환
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    // /api/movies/detail
+    @GetMapping("/detail/{movieKey}")
+    public MovieDto goTogetMovieDetails(@RequestBody MovieDto movieDto) {
+            return movieService.getMovieDetails(movieDto);
     }
 
     // 영화 삭제

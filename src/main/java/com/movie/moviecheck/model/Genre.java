@@ -30,5 +30,5 @@ public class Genre {
     private String genreName;
 
     @OneToMany(mappedBy = "genre")
-    private List<UserGenre> userGenres;
+    private List<UserGenre> userGenre;
 }

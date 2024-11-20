@@ -5,9 +5,14 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.movie.moviecheck.converter.ReviewConvertor;
+import com.movie.moviecheck.dto.ReviewDto;
+import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.repository.ReviewRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -15,11 +20,19 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final ReviewConvertor reviewConvertor;
 
+
+    // 추후 수정
     // 리뷰 추가
-    public Review addReview(Review review) {
-        return reviewRepository.save(review);
-    }
+    // public ReviewDto addReview(ReviewDto reviewDto,Movie movie,HttpServletRequest request) {
+    //     HttpSession session = request.getSession(false);
+    //     Integer userKey = (Integer) session.getAttribute("userKey")
+    //     Review review = reviewConvertor.convertToEntity(reviewDto,movie);
+    //     Review saveReview = reviewRepository.save(review);
+    //     saveReview = reviewConvertor.convertToDto(saveReview,movie);
+    //     return saveReview;
+    // }
 
     // 리뷰 삭제
     public void deleteReview(Integer reviewKey) {

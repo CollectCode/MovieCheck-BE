@@ -62,7 +62,7 @@ public class User {
 
     @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
     @JsonManagedReference
-    private List<UserGenre> userGenre;
+    private List<UserGenre> userGenre;  
 
     @Transient
     private String sessionId;

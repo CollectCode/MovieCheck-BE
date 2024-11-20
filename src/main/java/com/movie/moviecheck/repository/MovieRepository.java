@@ -13,6 +13,4 @@ public interface MovieRepository extends JpaRepository<Movie,String>  {
 
     // movieKey가 존재하는지 확인
     boolean existsByMovieKey(String movieKey);
-
-
 }

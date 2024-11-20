@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.movie.moviecheck.dto.GenreDto;
-import com.movie.moviecheck.service.GenreService;
 import com.movie.moviecheck.service.UserGenreService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class UserGenreController { 
 
     private final UserGenreService userGenreService;
-    private final GenreService genreService;
 
     @GetMapping("/genres")
     public ResponseEntity<WrapperClass<List<GenreDto>>> goToGetLikeGenre(HttpServletRequest request) {
