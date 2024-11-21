@@ -40,7 +40,7 @@ public class Movie {
     private String moviePoster;
 
     @Column(name = "movie_score", nullable = true)
-    private Integer movieScore = 0;  // 기본값 0
+    private double movieScore = 0;  // 기본값 0
 
     @Column(name = "movie_director", length = 30)
     private String movieDirector;

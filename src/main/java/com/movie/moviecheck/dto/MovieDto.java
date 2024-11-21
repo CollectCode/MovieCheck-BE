@@ -17,7 +17,7 @@ public class MovieDto {
     private String movieTitle;     // 영화 제목
     private String movieOverview;   // 영화 개요
     private String moviePoster;     // 영화 포스터 URL
-    private Integer movieScore;     // 영화 평점
+    private double movieScore;     // 영화 평점
     private String movieDirector;   // 감독
     private Integer movieRuntime;
     private LocalDate movieRelease;

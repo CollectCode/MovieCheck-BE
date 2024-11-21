@@ -9,23 +9,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/movie-genre")
+@RequestMapping("/api/genre_movie")
 @RequiredArgsConstructor
 public class GenreMovieController {
 
     private final GenreMovieService movieGenreService;
 
+    // ?? 이게 필요한가
     // api 나중에 수정
     // 1. 특정 장르별 영화 가져오기
-    @GetMapping("/by-genre")
-    public List<GenreMovie> getMoviesByGenreKey(@RequestBody GenreDto genreDto) {
+    @GetMapping
+    public List<GenreMovie> goTogetMoviesByGenreKey(@RequestBody GenreDto genreDto) {
         return movieGenreService.getMoviesByGenreKey(genreDto.getGenreKey());
     }
 
-    // api 나중에 수정
-    // 2. 사용자가 선호하는 장르의 영화를 가져오기
-    @PostMapping("/by-preferred-genres")
-    public List<GenreMovie> getMoviesByPreferredGenres(@RequestBody List<String> preferredGenreKeys) {
-        return movieGenreService.getMoviesByPreferredGenres(preferredGenreKeys);
-    }
 }

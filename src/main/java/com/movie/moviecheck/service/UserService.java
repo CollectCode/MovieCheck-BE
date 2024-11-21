@@ -151,19 +151,24 @@ public class UserService {
         String msg = "";
         if (session != null) {
             Integer userKey = (Integer) session.getAttribute("userKey"); // 세션에서 userKey 가져오기
-            UserDto user = userConvertor.convertToDto(findByKey(userKey));
-            if (userKey != null) {
+            User user = findByKey(userKey);
+            if (userKey != null && user != null) {
                 // 서버 메모리에서 세션 ID 확인 (필요시)
                 String sessionId = getSession(userKey);
-                // 사용자 정보 가져오기
-                msg = "마이페이지 로딩성공.";
-                return ResponseEntity.ok(new WrapperClass<>(user, msg)); // 사용자 정보를 메시지와 함께 반환
+    
+                // 사용자 정보 가져오기 및 Base64 이미지 변환
+                UserDto userDto = userConvertor.convertToDto(user);
+                String base64Image = convertImageToBase64(user.getUserProfile());
+                userDto.setUserProfile(base64Image);    
+    
+                msg = "마이페이지 로딩 성공.";
+                return ResponseEntity.ok(new WrapperClass<>(userDto, msg)); // 사용자 정보를 메시지와 함께 반환
             }
         }
         msg = "세션이 유효하지 않습니다."; // 403 : 서버가 요청을 이해했지만, 접근을 거부했을 때
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new WrapperClass<>(null, msg)); // 세션이 없거나 유효하지 않으면 401
-                                                                                                // 반환
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new WrapperClass<>(null, msg)); // 세션이 없거나 유효하지 않으면 403 반환
     }
+    
 
     // 로그아웃을 진행하는 로직
     public ResponseEntity<WrapperClass<UserDto>> logout(HttpServletRequest request, HttpServletResponse response) {
@@ -247,6 +252,11 @@ public class UserService {
             // 업데이트 후 저장
             user = saveUser(user);
             updatedUser = userConvertor.convertToDto(user);
+    
+            // Base64로 변환된 이미지 추가
+            String base64Image = convertImageToBase64(user.getUserProfile());
+            updatedUser.setUserProfile(base64Image);
+    
             status = HttpStatus.OK;
             return ResponseEntity
                     .status(status)
@@ -259,6 +269,7 @@ public class UserService {
                     .body(new WrapperClass<>(userDto, msg));
         }
     }
+    
 
     // 업로드 이미지 세팅로직
     public ResponseEntity<WrapperClass<UserDto>> uploadImage(HttpServletRequest request, MultipartFile userImage) {
@@ -300,49 +311,24 @@ public class UserService {
     }
 
     // 이미지를 반환하는 메서드
-    public ResponseEntity<WrapperClass<String>> getUserImage(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            return ResponseEntity.status(401)
-                    .body(new WrapperClass<>(null, "세션이 없습니다."));
+    private String convertImageToBase64(String userProfilePath) {
+        if (userProfilePath == null || userProfilePath.isEmpty()) {
+            return null;
         }
-
-        Integer userKey = (Integer) session.getAttribute("userKey");
-        if (userKey == null) {
-            return ResponseEntity.status(401)
-                    .body(new WrapperClass<>(null, "유효한 사용자 키가 없습니다."));
-        }
-
-        // 사용자 조회
-        User user = findByKey(userKey);
-        if (user == null) {
-            return ResponseEntity.status(404)
-                    .body(new WrapperClass<>(null, "사용자 또는 프로필 이미지가 없습니다."));
-        }
-
-        // 이미지 파일 경로
-        String imagePath = new File("src/main/resources/static" + user.getUserProfile()).getAbsolutePath();
+        String imagePath = new File("src/main/resources/static" + userProfilePath).getAbsolutePath();
         File imageFile = new File(imagePath);
-
         if (!imageFile.exists()) {
-            return ResponseEntity.status(404)
-                    .body(new WrapperClass<>(null, "이미지 파일이 존재하지 않습니다."));
+            return null; // 이미지 파일이 존재하지 않는 경우
         }
-
         try {
-            // 이미지 파일을 Base64로 변환
             byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
-            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-
-            return ResponseEntity.ok()
-                    .body(new WrapperClass<>(base64Image, "이미지 변환 성공"));
-
+            return Base64.getEncoder().encodeToString(imageBytes); // Base64 인코딩
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500)
-                    .body(new WrapperClass<>(null, "이미지 처리 중 오류가 발생했습니다."));
+            return null; // 변환 중 오류 발생 시 null 반환
         }
     }
+    
 
     // 회원 생성 및 갱신
     public User saveUser(User user) {

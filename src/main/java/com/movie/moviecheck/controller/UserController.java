@@ -87,10 +87,4 @@ public class UserController {
         return userService.uploadImage(request, userImage);
     }
 
-    // 이미지 반환
-    @GetMapping("/getuserimage")
-    public ResponseEntity<WrapperClass<String>> goToUserImage(HttpServletRequest request) {
-        return userService.getUserImage(request);
-    }
-
 }
