@@ -33,7 +33,7 @@ public class Movie {
     @Column(name = "movie_title", nullable = false, length = 50)
     private String movieTitle;
 
-    @Column(name = "movie_overview", length = 255)
+    @Column(name = "movie_overview", length = 10000)
     private String movieOverview;
 
     @Column(name = "movie_poster", length = 255)

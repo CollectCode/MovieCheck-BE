@@ -15,6 +15,7 @@ import com.movie.moviecheck.model.UserGenre;
 import com.movie.moviecheck.repository.GenreMovieRepository;
 import com.movie.moviecheck.repository.MovieRepository;
 import com.movie.moviecheck.repository.UserGenreRepository;
+import com.movie.moviecheck.util.ImageUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,18 +48,26 @@ public class MovieService {
     public Map<String, Object> getAllMovies() {
         // 1. 모든 영화 가져오기
         List<Movie> movies = movieRepository.findAll();
+
+        // 2. 영화 리스트를 DTO로 변환하고 이미지 Base64 처리
         List<MovieDto> movieDtos = movies.stream()
-                                         .map(movieConvertor::convertToDto)
-                                         .collect(Collectors.toList());
-    
-        // 2. 응답 데이터 구성
+                                        .map(movie -> {
+                                            MovieDto dto = movieConvertor.convertToDto(movie);
+                                            // Base64로 변환된 포스터 이미지 추가
+                                            String base64Poster = ImageUtil.encodeImageToBase64(movie.getMoviePoster());
+                                            dto.setMoviePoster(base64Poster);
+                                            return dto;
+                                        })
+                                        .collect(Collectors.toList());
+
+        // 3. 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();
         response.put("movies", movieDtos);
         response.put("count", movieDtos.size());
-    
+
         return response; // 영화 목록과 영화 수를 포함하는 Map 반환
     }
-    
+
     // 영화 디테일에서 사용
     public MovieDto getMovies(String movieKey){
         Movie movie = movieRepository.findByMovieKey(movieKey);
@@ -81,7 +90,6 @@ public class MovieService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
-
 
     // 사용자가 선호하는 영화 가져오는 메서드
     public Map<String, Object> getMoviesByUserPreferences(HttpServletRequest request) {
