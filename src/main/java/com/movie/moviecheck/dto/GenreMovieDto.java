@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieGenreDto {
+public class GenreMovieDto {
 
     private String movieKey;
     private String genreKey;

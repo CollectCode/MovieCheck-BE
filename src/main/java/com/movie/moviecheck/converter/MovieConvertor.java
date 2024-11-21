@@ -19,6 +19,8 @@ public class MovieConvertor {
             .moviePoster(movie.getMoviePoster())
             .movieScore(movie.getMovieScore())
             .movieDirector(movie.getMovieDirector())
+            .movieRuntime(movie.getMovieRuntime())
+            .movieRelease(movie.getMovieRelease())
             .build();
     }
 
@@ -34,6 +36,8 @@ public class MovieConvertor {
         .moviePoster(movieDto.getMoviePoster())
         .movieScore(movieDto.getMovieScore())
         .movieDirector(movieDto.getMovieDirector())
+        .movieRuntime(movieDto.getMovieRuntime())
+        .movieRelease(movieDto.getMovieRelease())
         .build();
     }
 }

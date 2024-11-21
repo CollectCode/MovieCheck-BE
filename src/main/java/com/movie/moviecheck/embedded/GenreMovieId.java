@@ -8,32 +8,33 @@ import lombok.Data;
 
 @Data
 @Embeddable
-public class MovieGenreId implements Serializable {
+public class GenreMovieId implements Serializable {
 
-    private String movieKey;
     private String genreKey;
+    private String movieKey;
+    
 
-    public MovieGenreId() {
+    public GenreMovieId() {
 
     }
 
-    public MovieGenreId(String movieKey, String genreKey) {
-        this.movieKey = movieKey;
+    public GenreMovieId(String movieKey, String genreKey) {
         this.genreKey = genreKey;
+        this.movieKey = movieKey;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MovieGenreId that = (MovieGenreId) o;
-        return Objects.equals(movieKey, that.movieKey) &&
-               Objects.equals(genreKey, that.genreKey);
+        GenreMovieId that = (GenreMovieId) o;
+        return Objects.equals(genreKey, that.genreKey) &&
+               Objects.equals(movieKey, that.movieKey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(movieKey, genreKey);
+        return Objects.hash(genreKey, movieKey);
     }
 
     // Setter 메서드

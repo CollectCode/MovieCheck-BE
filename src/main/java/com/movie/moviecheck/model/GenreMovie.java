@@ -1,7 +1,7 @@
 package com.movie.moviecheck.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.movie.moviecheck.embedded.MovieGenreId;
+import com.movie.moviecheck.embedded.GenreMovieId;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -20,10 +20,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "movie_genre_table")
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieGenre {
+public class GenreMovie {
 
     @EmbeddedId
-    private MovieGenreId id;
+    private GenreMovieId id;
 
     @ManyToOne
     @MapsId("movieKey")

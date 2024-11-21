@@ -1,7 +1,11 @@
 package com.movie.moviecheck.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -40,4 +44,19 @@ public class Movie {
 
     @Column(name = "movie_director", length = 30)
     private String movieDirector;
+
+    @Column(name = "movie_runtime")
+    private int movieRuntime;
+
+    @Column(name = "movie_release", nullable = false)
+    private LocalDate movieRelease;  // 날짜만 저장
+
+    // 영화와 배우 매핑
+    @OneToMany(mappedBy="movie", cascade=CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<MovieActor> movieActor;
+
+    // 장르와 영화 매핑
+    @OneToMany(mappedBy = "movie")
+    private List<GenreMovie> movieGenre;
 }

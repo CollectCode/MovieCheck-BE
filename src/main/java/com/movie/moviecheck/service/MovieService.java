@@ -1,16 +1,15 @@
 package com.movie.moviecheck.service;
 
-import com.movie.moviecheck.controller.MovieController;
 import com.movie.moviecheck.converter.MovieConvertor;
-import com.movie.moviecheck.converter.UserConvertor;
 import com.movie.moviecheck.dto.MovieDto;
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.repository.MovieRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,49 +21,36 @@ public class MovieService {
 
     private final MovieRepository movieRepository;
     private final MovieConvertor movieConvertor;
-    // 영화 조회
+
+    // 모든 영화 정보 가져오기
     public List<MovieDto> getAllMovies() {
-        List<Movie> movies = movieRepository.findAll();  // Movie 리스트를 가져옴
+        List<Movie> movies = movieRepository.findAll();
         return movies.stream()
-                     .map(movie -> {
-                         // MovieDto로 변환
-                         MovieDto movieDto = movieConvertor.convertToDto(movie);
-                         // 줄거리(movie_overview)가 255자를 초과하거나 같으면 '...' 추가
-                         if (movieDto.getMovieOverview().length() >= 255) {
-                             movieDto.setMovieOverview(movieDto.getMovieOverview().substring(0, 255) + "...");
-                         }
-                         return movieDto;
-                     })
+                     .map(movieConvertor::convertToDto)
                      .collect(Collectors.toList());
     }
 
-    // 영화 디테일
-    public MovieDto getMovieDetails(MovieDto movieDto) {
-        // 요청으로 받은 movieDto에서 영화 ID를 사용해 해당 영화를 DB에서 조회
-        Movie movie = movieRepository.findById(movieDto.getMovieKey()).orElse(null);
-        
-        if (movie != null) {
-            // Movie 객체를 MovieDto로 변환
-            movieDto = movieConvertor.convertToDto(movie);
+    public MovieDto getMovies(String movieKey){
+        Movie movie = movieRepository.findByMovieKey(movieKey);
+        return movieConvertor.convertToDto(movie);
+    }
+
+    // 영화 디테일 조회
+    public ResponseEntity<MovieDto> getMovieDetails(MovieDto movieDto) {
+        String movieKey = movieDto.getMovieKey();
+        // 1. 요청 검증: movieKey가 없는 경우 400 Bad Request 반환
+        if (movieKey == null || movieKey.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            // 2. Movie 상세 정보 조회
+            MovieDto movieDetails = getMovies(movieKey);
+            return ResponseEntity.ok(movieDetails);
+        } catch (EntityNotFoundException e) {
+            // 3. 조회 실패 시 404 Not Found 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
     
-            // 줄거리 255자 초과 시 '...' 추가
-            if (movieDto.getMovieOverview().length() > 255) {
-                movieDto.setMovieOverview(movieDto.getMovieOverview().substring(0, 255) + "...");
-            }
-            
-            return movieDto;
-        } else {
-            return null; // 영화가 없는 경우 null 반환
-        }
-    }
-
-
-    // 영화 삭제
-    public boolean deleteMovie(String movieKey) {
-        if (movieRepository.existsByMovieKey(movieKey)) {
-            movieRepository.existsByMovieKey(movieKey);
-            return true;
-        }
-        return false;
-    }
+    
 }

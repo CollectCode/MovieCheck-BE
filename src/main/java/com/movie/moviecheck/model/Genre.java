@@ -2,6 +2,9 @@ package com.movie.moviecheck.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -29,6 +32,13 @@ public class Genre {
     @Column(name = "genre_name", length = 20)
     private String genreName;
 
+    // 회원과 장르 매핑
     @OneToMany(mappedBy = "genre")
     private List<UserGenre> userGenre;
+
+    // 장르와 영화 매핑
+    @OneToMany(mappedBy="genre", cascade=CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<GenreMovie> movieGenre;
+
 }
