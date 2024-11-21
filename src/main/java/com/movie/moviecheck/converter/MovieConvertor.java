@@ -4,19 +4,20 @@ import org.springframework.stereotype.Component;
 
 import com.movie.moviecheck.dto.MovieDto;
 import com.movie.moviecheck.model.Movie;
+import com.movie.moviecheck.util.ImageUtil;
 
 @Component
 public class MovieConvertor {
 
     public MovieDto convertToDto(Movie movie) {
-        if(movie == null){
+        if (movie == null) {
             return null;
         }
         return MovieDto.builder()
             .movieKey(movie.getMovieKey())
             .movieTitle(movie.getMovieTitle())
             .movieOverview(movie.getMovieOverview())
-            .moviePoster(movie.getMoviePoster())
+            .moviePoster(ImageUtil.encodeImageToBase64(movie.getMoviePoster())) // Base64로 변환
             .movieScore(movie.getMovieScore())
             .movieDirector(movie.getMovieDirector())
             .movieRuntime(movie.getMovieRuntime())
