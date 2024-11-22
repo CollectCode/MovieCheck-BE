@@ -13,17 +13,6 @@ import java.util.Optional;
 public class ActorService {
 
     private final ActorRepository actorRepository; // JPA Repository 사용
-
-    // 배우 추가
-    public Actor addActor(Actor actor) {
-        return actorRepository.save(actor);
-    }
-
-    // 배우 삭제
-    public void deleteActor(String actorKey) {
-        actorRepository.deleteById(actorKey);
-    }
-
     // 모든 배우 조회
     public List<Actor> getAllActors() {
         return actorRepository.findAll();

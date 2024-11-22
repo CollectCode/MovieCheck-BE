@@ -17,22 +17,6 @@ public class ActorController {
 
     private final ActorService actorService;
 
-    // 배우 추가
-    // /api/actors/create
-    @PostMapping("/create")
-    public ResponseEntity<Actor> addActor(@RequestBody Actor actor) {
-        Actor savedActor = actorService.addActor(actor);
-        return ResponseEntity.ok(savedActor);
-    }
-
-    // 배우 삭제
-    // /api/actors/{actorKey}
-    @DeleteMapping("/{actorKey}")
-    public ResponseEntity<Void> deleteActor(@PathVariable String actorKey) {
-        actorService.deleteActor(actorKey);
-        return ResponseEntity.noContent().build();
-    }
-
     // 모든 배우 조회
     // /api/actors
     @GetMapping

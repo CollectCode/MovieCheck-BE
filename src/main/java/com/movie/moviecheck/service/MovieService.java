@@ -5,9 +5,11 @@ import com.movie.moviecheck.controller.WrapperClass;
 import com.movie.moviecheck.converter.GenreConvertor;
 import com.movie.moviecheck.converter.MovieConvertor;
 import com.movie.moviecheck.converter.UserConvertor;
+import com.movie.moviecheck.dto.ActorDto;
 import com.movie.moviecheck.dto.GenreDto;
 import com.movie.moviecheck.dto.MovieDto;
 import com.movie.moviecheck.dto.UserDto;
+import com.movie.moviecheck.model.Actor;
 import com.movie.moviecheck.model.Genre;
 import com.movie.moviecheck.model.GenreMovie;
 import com.movie.moviecheck.model.Movie;
@@ -69,18 +71,41 @@ public class MovieService {
     }
 
     // 영화 디테일에서 사용
-    public MovieDto getMovies(String movieKey){
-        Movie movie = movieRepository.findByMovieKey(movieKey);
-        return movieConvertor.convertToDto(movie);
-    }
+    public MovieDto getMovies(String movieKey) {
+    // 영화 엔티티 조회
+    Movie movie = movieRepository.findByMovieKey(movieKey);
+
+    // 영화 정보를 DTO로 변환
+    MovieDto movieDto = movieConvertor.convertToDto(movie);
+
+    // 영화에 속한 배우 정보 가져오기
+    List<ActorDto> actors = movie.getMovieActor().stream()
+            .map(movieActor -> {
+                Actor actor = movieActor.getActor();
+                String base64Profile = ImageUtil.encodeImageToBase64(actor.getActorImage());
+                return new ActorDto(
+                        actor.getActorKey(),
+                        actor.getActorName(),
+                        base64Profile
+                );
+            })
+            .collect(Collectors.toList());
+
+    // 배우 정보를 DTO에 추가
+    movieDto.setActors(actors);
+
+    return movieDto;
+}
 
     // 영화 디테일 조회
     public ResponseEntity<MovieDto> getMovieDetails(MovieDto movieDto) {
         String movieKey = movieDto.getMovieKey();
-        // 1. 요청 검증: movieKey가 없는 경우 400 Bad Request 반환
+    
+        // 1. 요청 검증
         if (movieKey == null || movieKey.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
+    
         try {
             // 2. Movie 상세 정보 조회
             MovieDto movieDetails = getMovies(movieKey);
@@ -90,6 +115,7 @@ public class MovieService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+    
 
     // 사용자가 선호하는 영화 가져오는 메서드
     public Map<String, Object> getMoviesByUserPreferences(HttpServletRequest request) {

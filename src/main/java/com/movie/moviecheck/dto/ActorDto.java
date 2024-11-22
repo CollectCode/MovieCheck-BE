@@ -13,6 +13,5 @@ public class ActorDto {
 
     private String actorKey;
     private String actorName;
-    private String actorHometown;
     private String actorImage;
 }
