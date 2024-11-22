@@ -19,6 +19,5 @@ public class ReviewDto {
     private Integer userKey;           // 사용자 키
     private String reviewContent;      // 리뷰 내용
     private LocalDateTime reviewTime; // 리뷰 시간
-    private Integer reviewGood;       // 긍정적인 평가 수
-    private Integer reviewBad;        // 부정적인 평가 수
+    private Integer reviewLike;       // 긍정적인 평가 수
 }

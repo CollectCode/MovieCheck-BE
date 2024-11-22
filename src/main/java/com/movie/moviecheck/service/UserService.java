@@ -158,8 +158,6 @@ public class UserService {
     
                 // 사용자 정보 가져오기 및 Base64 이미지 변환
                 UserDto userDto = userConvertor.convertToDto(user);
-                String base64Image = convertImageToBase64(user.getUserProfile());
-                userDto.setUserProfile(base64Image);    
     
                 msg = "마이페이지 로딩 성공.";
                 return ResponseEntity.ok(new WrapperClass<>(userDto, msg)); // 사용자 정보를 메시지와 함께 반환
@@ -253,11 +251,7 @@ public class UserService {
             user = saveUser(user);
             updatedUser = userConvertor.convertToDto(user);
     
-            // Base64로 변환된 이미지 추가
-            String base64Image = convertImageToBase64(user.getUserProfile());
-            updatedUser.setUserProfile(base64Image);
-    
-            status = HttpStatus.OK;
+                status = HttpStatus.OK;
             return ResponseEntity
                     .status(status)
                     .body(new WrapperClass<>(updatedUser, msg));

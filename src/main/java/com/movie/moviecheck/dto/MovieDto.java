@@ -23,5 +23,11 @@ public class MovieDto {
     private Integer movieRuntime;
     private LocalDate movieRelease;
     private List<ActorDto> actors;
+
+    public MovieDto(String movieKey, String movieTitle, String moviePoster) {
+        this.movieKey = movieKey;
+        this.movieTitle = movieTitle;
+        this.moviePoster = moviePoster;        
+    }
 }
 

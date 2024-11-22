@@ -56,7 +56,11 @@ public class Movie {
     @JsonManagedReference
     private List<MovieActor> movieActor;
 
+    @OneToMany(mappedBy="movie", cascade=CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<Review> review;
+
     // 장르와 영화 매핑
     @OneToMany(mappedBy = "movie")
-    private List<GenreMovie> movieGenre;
+    private List<GenreMovie> genreMovie;
 }

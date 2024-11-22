@@ -2,38 +2,45 @@ package com.movie.moviecheck.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.movie.moviecheck.embedded.ReviewId;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Data
 @Entity
 @Table(name = "review_table")
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Review {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_key", nullable = false)
-    private Integer reviewKey;
+    @EmbeddedId
+    private ReviewId id;
 
     @ManyToOne
-    @JoinColumn(name = "movie_key", referencedColumnName = "movie_key", nullable = false)
+    @MapsId("movieKey")
+    @JoinColumn(name = "movie_key")
+    @JsonBackReference
     private Movie movie; // Movie 엔티티와의 관계
 
     @ManyToOne
-    @JoinColumn(name = "user_key", referencedColumnName = "userKey") // userKey로 매핑
+    @MapsId("userKey")
+    @JoinColumn(name = "user_key")
     private User user; // User 엔티티와의 관계
 
     @Column(name = "review_content", nullable = false, length = 255)
@@ -42,9 +49,6 @@ public class Review {
     @Column(name = "review_time", nullable = false)
     private LocalDateTime reviewTime;
 
-    @Column(name = "review_good", nullable = false)
-    private Integer reviewGood;
-
-    @Column(name = "review_bad", nullable = false)
-    private Integer reviewBad;
+    @Column(name = "review_like", nullable = false)
+    private Integer reviewLike;
 }

@@ -2,6 +2,8 @@ package com.movie.moviecheck.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.movie.moviecheck.model.Movie;
 
@@ -22,4 +24,8 @@ public interface MovieRepository extends JpaRepository<Movie,String>  {
     List<Movie> findByMovieTitleIn(List<String> movieTitle);
 
     List<Movie> findByMovieTitleContainingIgnoreCase(String movieTitle);
+
+    Page<Movie> findAll(Pageable pageable);
+
+    Page<Movie> findByMovieTitleContainingIgnoreCase(String title, Pageable pageable);
 }

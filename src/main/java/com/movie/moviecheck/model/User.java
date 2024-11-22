@@ -42,12 +42,6 @@ public class User {
     @Column(name = "user_name", nullable = false, length = 20)
     private String userName;
 
-    @Column(name = "user_good", nullable = false)
-    private int userGood = 0; // 기본값 0
-
-    @Column(name = "user_bad", nullable = false)
-    private int userBad = 0; // 기본값 0
-
     @Column(name = "user_grade", nullable = false, length = 8)
     private String userGrade = "관람객";
 
@@ -62,20 +56,21 @@ public class User {
 
     @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
     @JsonManagedReference
-    private List<UserGenre> userGenre;  
+    private List<UserGenre> userGenre;
+
+    @OneToMany(mappedBy = "user")
+    private List<Review> review;
 
     @Transient
     private String sessionId;
 
     // 성별을 인자로 받아 userKey 생성
     public User(Integer userKey,String userEmail, String userPassword, String userName,
-                int userGood,int userBad,String userContent,int userGender, String userProfile) {
+                String userContent,int userGender, String userProfile) {
         this.userKey = userKey;
         this.userEmail = userEmail;
         this.userPassword = userPassword;
         this.userName = userName;
-        this.userGood = userGood;
-        this.userBad = userBad;
         this.userContent = userContent;
         this.userGender = userGender;
         this.userProfile = userProfile;

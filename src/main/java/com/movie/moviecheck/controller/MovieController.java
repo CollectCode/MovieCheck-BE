@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +28,9 @@ public class MovieController {
 
     // 영화 정보 가져오기
     @GetMapping
-    public ResponseEntity<Map<String, Object>> goTogetAllMovies() {
-        Map<String, Object> result = movieService.getAllMovies();
+    public ResponseEntity<Map<String, Object>> goTogetAllMovies(
+        @PageableDefault(size=10) Pageable pageable) {
+        Map<String, Object> result = movieService.getAllMovies(pageable);
         return ResponseEntity.ok(result);
     }
 
@@ -40,14 +43,14 @@ public class MovieController {
 
     // 사용자가 선호하는 장르 영화 가져오기
     @GetMapping("/user")
-    public ResponseEntity<Map<String, Object>> getMoviesByUserPreferences(HttpServletRequest request) {
-        Map<String, Object> response = movieService.getMoviesByUserPreferences(request);
+    public ResponseEntity<Map<String, Object>> getMoviesByUserPreferences(HttpServletRequest request, @PageableDefault(size=10) Pageable pageable) {
+        Map<String, Object> response = movieService.getMoviesByUserPreferences(request, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/search")
-    public ResponseEntity<Map<String, Object>> searchMovies(@RequestBody MovieDto movieDto) {
-        Map<String, Object> response = movieService.searchMoviesByTitle(movieDto);
+    public ResponseEntity<Map<String, Object>> searchMovies(@RequestBody MovieDto movieDto, @PageableDefault(size=10) Pageable pageable) {
+        Map<String, Object> response = movieService.searchMoviesByTitle(movieDto, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

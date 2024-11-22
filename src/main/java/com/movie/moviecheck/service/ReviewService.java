@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.movie.moviecheck.converter.ReviewConvertor;
 import com.movie.moviecheck.dto.ReviewDto;
+import com.movie.moviecheck.embedded.ReviewId;
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.repository.ReviewRepository;
@@ -35,8 +36,8 @@ public class ReviewService {
     // }
 
     // 리뷰 삭제
-    public void deleteReview(Integer reviewKey) {
-        reviewRepository.deleteById(reviewKey);
+    public void deleteReview(ReviewId reviewId) {
+        reviewRepository.deleteById(reviewId);
     }
 
     // 특정 영화의 모든 리뷰 조회
@@ -50,7 +51,7 @@ public class ReviewService {
     }
 
     // 특정 리뷰 조회
-    public Optional<Review> getReviewById(Integer reviewKey) {
-        return reviewRepository.findById(reviewKey);
+    public Optional<Review> getReviewById(ReviewId reviewId) {
+        return reviewRepository.findById(reviewId);
     }
 }

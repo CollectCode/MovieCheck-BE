@@ -31,11 +31,11 @@ public class ReviewController {
     
     // 리뷰 삭제
     // /api/reviews/{reviewKey}
-    @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteReview(@PathVariable Integer reviewKey) {
-        reviewService.deleteReview(reviewKey);
-        return ResponseEntity.noContent().build();
-    }
+    // @DeleteMapping("/delete")
+    // public ResponseEntity<Void> deleteReview(@PathVariable Integer reviewKey) {
+    //     reviewService.deleteReview(reviewKey);
+    //     return ResponseEntity.noContent().build();
+    // }
 
     // 특정 영화에 대한 모든 리뷰 조회
     // /api/reviews/movie/{movieKey}
@@ -55,9 +55,9 @@ public class ReviewController {
 
     // 특정 리뷰 조회
     // /api/reviews/{reviewKey}
-    @GetMapping("/{reviewKey}")
-    public ResponseEntity<Review> getReviewById(@PathVariable Integer reviewKey) {
-        Optional<Review> review = reviewService.getReviewById(reviewKey);
-        return review.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
+    // @GetMapping("/{reviewKey}")
+    // public ResponseEntity<Review> getReviewById(@PathVariable Integer reviewKey) {
+    //     Optional<Review> review = reviewService.getReviewById(reviewKey);
+    //     return review.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    // }
 }
