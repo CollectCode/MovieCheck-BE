@@ -279,7 +279,7 @@ public class UserService {
                 File destinationFile = new File(uploadDir, fileName);
                 try {
                     userImage.transferTo(destinationFile);
-                    user.setUserProfile("/images/users/" + fileName);
+                    user.setUserProfile("http://localhost:8080/images/users/" + fileName);
                     saveUser(user);
                     msg = "이미지 업로드 성공";
                     userDto = userConvertor.convertToDto(user);

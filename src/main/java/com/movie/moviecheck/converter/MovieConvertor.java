@@ -18,7 +18,6 @@ public class MovieConvertor {
             .movieOverview(movie.getMovieOverview())
             .moviePoster(movie.getMoviePoster()) // Base64로 변환
             .movieScore(movie.getMovieScore())
-            .movieDirector(movie.getMovieDirector())
             .movieRuntime(movie.getMovieRuntime())
             .movieRelease(movie.getMovieRelease())
             .build();
@@ -35,7 +34,6 @@ public class MovieConvertor {
         .movieOverview(movieDto.getMovieOverview())
         .moviePoster(movieDto.getMoviePoster())
         .movieScore(movieDto.getMovieScore())
-        .movieDirector(movieDto.getMovieDirector())
         .movieRuntime(movieDto.getMovieRuntime())
         .movieRelease(movieDto.getMovieRelease())
         .build();

@@ -16,25 +16,9 @@ import java.util.Optional;
 @RequestMapping("/api/genres")
 public class GenreController {
 
-
+    // 사용 안함
     private final GenreService genreService;
-
-    // 장르 추가
-    // /api/genres/create
-    @PostMapping("/create")
-    public ResponseEntity<Genre> addGenre(@RequestBody Genre genre) {
-        Genre savedGenre = genreService.addGenre(genre);
-        return ResponseEntity.ok(savedGenre);
-    }
-
-    // 장르 삭제
-    // /api/genres/{genreKey}
-    @DeleteMapping("/{genreKey}")
-    public ResponseEntity<Void> deleteGenre(@PathVariable String genreKey) {
-        genreService.deleteGenre(genreKey);
-        return ResponseEntity.noContent().build();
-    }
-
+    
     // 모든 장르 조회
     // /api/genres
     @GetMapping

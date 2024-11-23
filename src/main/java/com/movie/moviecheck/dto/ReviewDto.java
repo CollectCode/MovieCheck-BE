@@ -8,6 +8,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import com.movie.moviecheck.embedded.ReviewId;
+
 @Getter
 @Setter
 @Builder
@@ -20,4 +22,12 @@ public class ReviewDto {
     private String reviewContent;      // 리뷰 내용
     private LocalDateTime reviewTime; // 리뷰 시간
     private Integer reviewLike;       // 긍정적인 평가 수
+
+    public ReviewDto(ReviewId id, Integer userKey, String reviewContent, LocalDateTime reviewTime,
+            Integer reviewLike) {
+                this.userKey = userKey;
+                this.reviewContent = reviewContent;
+                this.reviewTime = reviewTime;
+                this.reviewLike = reviewLike;
+    }
 }

@@ -2,6 +2,9 @@ package com.movie.moviecheck.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.movie.moviecheck.model.Director;
+import com.movie.moviecheck.model.Review;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,9 +23,12 @@ public class MovieDto {
     private String moviePoster;     // 영화 포스터 URL
     private double movieScore;     // 영화 평점
     private String movieDirector;   // 감독
-    private Integer movieRuntime;
-    private LocalDate movieRelease;
-    private List<ActorDto> actors;
+    private Integer movieRuntime; // 영화 상영 시간
+    private LocalDate movieRelease; // 영화 개봉일
+    private List<ActorDto> actorDto; // 배우 이름, 사진
+    private List<ReviewDto> reviewDto; // 리뷰 남긴 유저의 키, 코멘트, 남긴 시간, 좋아요
+    private DirectorDto directorDto; // 감독 이름, 이미지 추가
+    private List<String> genres; // 장르 키 리스트 추가
 
     public MovieDto(String movieKey, String movieTitle, String moviePoster) {
         this.movieKey = movieKey;

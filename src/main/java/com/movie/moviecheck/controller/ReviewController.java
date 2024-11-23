@@ -24,40 +24,16 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     // 리뷰 추가
-    // @PostMapping("/create")
-    // public ResponseEntity<ReviewDto> goToAddReview(@RequestBody ReviewDto reviewDto,Movie movie, HttpServletRequest request) {
-    //     return reviewService.addReview(reviewDto,movie,request);
-    // }
+    @PostMapping("/create")
+    public ResponseEntity<ReviewDto> goToAddReview(@RequestBody ReviewDto reviewDto,Movie movie, HttpServletRequest request) {
+        return reviewService.addReview(reviewDto,request);
+    }
     
     // 리뷰 삭제
     // /api/reviews/{reviewKey}
-    // @DeleteMapping("/delete")
-    // public ResponseEntity<Void> deleteReview(@PathVariable Integer reviewKey) {
-    //     reviewService.deleteReview(reviewKey);
-    //     return ResponseEntity.noContent().build();
-    // }
-
-    // 특정 영화에 대한 모든 리뷰 조회
-    // /api/reviews/movie/{movieKey}
-    @GetMapping("/movie/{movieKey}")
-    public ResponseEntity<List<Review>> getReviewsByMovie(@PathVariable String movieKey) {
-        List<Review> reviews = reviewService.getReviewsByMovie(movieKey);
-        return ResponseEntity.ok(reviews);
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
+        return reviewService.deleteReview(request, reviewDto);
     }
 
-    // 특정 사용자에 대한 모든 리뷰 조회
-    // /api/reviews/user/{userKey}
-    @GetMapping("/user/{userKey}")
-    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable int userKey) {
-        List<Review> reviews = reviewService.getReviewsByUser(userKey);
-        return ResponseEntity.ok(reviews);
-    }
-
-    // 특정 리뷰 조회
-    // /api/reviews/{reviewKey}
-    // @GetMapping("/{reviewKey}")
-    // public ResponseEntity<Review> getReviewById(@PathVariable Integer reviewKey) {
-    //     Optional<Review> review = reviewService.getReviewById(reviewKey);
-    //     return review.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    // }
 }

@@ -2,14 +2,19 @@ package com.movie.moviecheck.service;
 
 import com.movie.moviecheck.controller.MovieListWithCount;
 import com.movie.moviecheck.controller.WrapperClass;
+import com.movie.moviecheck.converter.DirectorConvertor;
 import com.movie.moviecheck.converter.GenreConvertor;
 import com.movie.moviecheck.converter.MovieConvertor;
 import com.movie.moviecheck.converter.UserConvertor;
 import com.movie.moviecheck.dto.ActorDto;
+import com.movie.moviecheck.dto.DirectorDto;
 import com.movie.moviecheck.dto.GenreDto;
+import com.movie.moviecheck.dto.GenreMovieDto;
 import com.movie.moviecheck.dto.MovieDto;
+import com.movie.moviecheck.dto.ReviewDto;
 import com.movie.moviecheck.dto.UserDto;
 import com.movie.moviecheck.model.Actor;
+import com.movie.moviecheck.model.Director;
 import com.movie.moviecheck.model.Genre;
 import com.movie.moviecheck.model.GenreMovie;
 import com.movie.moviecheck.model.Movie;
@@ -48,6 +53,7 @@ public class MovieService {
     private final GenreConvertor genreConvertor;
     private final UserGenreRepository userGenreRepository;
     private final GenreMovieRepository genreMovieRepository;
+    private final DirectorConvertor directorConvertor;
 
     public Map<String, Object> getAllMovies(Pageable pageable) {
         // 1. 모든 영화 가져오기
@@ -84,17 +90,47 @@ public class MovieService {
     List<ActorDto> actors = movie.getMovieActor().stream()
             .map(movieActor -> {
                 Actor actor = movieActor.getActor();
-                String base64Profile = ImageUtil.encodeImageToBase64(actor.getActorImage());
                 return new ActorDto(
                         actor.getActorKey(),
                         actor.getActorName(),
-                        base64Profile
+                        actor.getActorImage()
                 );
             })
             .collect(Collectors.toList());
 
-    // 배우 정보를 DTO에 추가
-    movieDto.setActors(actors);
+    // 해당 영화의 리뷰 가져오기    
+    List<ReviewDto> reviews = movie.getReview().stream()
+                .map(review -> {
+                    return new ReviewDto(
+                            review.getId(),
+                            review.getUser().getUserKey(),
+                            review.getReviewContent(),
+                            review.getReviewTime(),
+                            review.getReviewLike()
+                    );
+                })
+                .toList();
+
+    // 감독 정보 가져오기
+    Director director = movie.getDirector();
+    DirectorDto directorDto = null;
+    if (director != null) {
+        directorDto = new DirectorDto(
+                director.getDirectorName(),
+                director.getDirectorImage()
+        );
+    }
+    // 영화 장르 가져오기
+    List<GenreMovie> genreMovies = genreMovieRepository.findByMovie_MovieKey(movieKey);
+    List<String> genreKeys = genreMovies.stream()
+            .map(genreMovie -> genreMovie.getGenre().getGenreName()) // 필요한 정보로 변경
+            .toList();
+
+    // DTO에 데이터 설정
+    movieDto.setActorDto(actors); // 배우 추가
+    movieDto.setReviewDto(reviews); // 리뷰 추가
+    movieDto.setDirectorDto(directorDto); // 감독 추가
+    movieDto.setGenres(genreKeys); // 장르 추가
 
     return movieDto;
 }

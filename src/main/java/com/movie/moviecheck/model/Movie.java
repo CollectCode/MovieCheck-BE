@@ -8,8 +8,10 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,9 +44,6 @@ public class Movie {
     @Column(name = "movie_score", nullable = true)
     private double movieScore = 0;  // 기본값 0
 
-    @Column(name = "movie_director", length = 30)
-    private String movieDirector;
-
     @Column(name = "movie_runtime")
     private int movieRuntime;
 
@@ -62,5 +61,9 @@ public class Movie {
 
     // 장르와 영화 매핑
     @OneToMany(mappedBy = "movie")
+    @JsonManagedReference
     private List<GenreMovie> genreMovie;
+
+    @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL)
+    private Director director;
 }
