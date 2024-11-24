@@ -32,7 +32,7 @@ public class Movie {
     @Column(name = "movie_key", nullable = false, length = 7)
     private String movieKey;
 
-    @Column(name = "movie_title", nullable = false, length = 50)
+    @Column(name = "movie_title", nullable = false, length = 255)
     private String movieTitle;
 
     @Column(name = "movie_overview", length = 10000)
