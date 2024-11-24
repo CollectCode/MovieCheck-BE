@@ -158,7 +158,9 @@ public class UserService {
     
                 // 사용자 정보 가져오기 및 Base64 이미지 변환
                 UserDto userDto = userConvertor.convertToDto(user);
-    
+                if(userDto.getUserProfile().equals("")){
+                    userDto.setUserProfile("http://localhost:8080/images/movies/default.png");
+                }
                 msg = "마이페이지 로딩 성공.";
                 return ResponseEntity.ok(new WrapperClass<>(userDto, msg)); // 사용자 정보를 메시지와 함께 반환
             }

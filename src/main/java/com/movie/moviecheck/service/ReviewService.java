@@ -2,7 +2,6 @@ package com.movie.moviecheck.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,12 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.movie.moviecheck.converter.ReviewConvertor;
 import com.movie.moviecheck.dto.ReviewDto;
-import com.movie.moviecheck.embedded.ReviewId;
-import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.repository.ReviewRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +92,7 @@ public class ReviewService {
     }
 
     // 특정 리뷰 조회
-    public Optional<Review> getReviewById(ReviewId reviewId) {
-        return reviewRepository.findById(reviewId);
+    public Review getReviewByKey(Integer reviewKey) {
+        return reviewRepository.findByReviewKey(reviewKey);
     }
 }

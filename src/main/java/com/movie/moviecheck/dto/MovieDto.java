@@ -28,7 +28,7 @@ public class MovieDto {
     private List<ActorDto> actorDto; // 배우 이름, 사진
     private List<ReviewDto> reviewDto; // 리뷰 남긴 유저의 키, 코멘트, 남긴 시간, 좋아요
     private DirectorDto directorDto; // 감독 이름, 이미지 추가
-    private List<String> genres; // 장르 키 리스트 추가
+    private List<String> genresName; // 장르 키 리스트 추가
 
     public MovieDto(String movieKey, String movieTitle, String moviePoster) {
         this.movieKey = movieKey;

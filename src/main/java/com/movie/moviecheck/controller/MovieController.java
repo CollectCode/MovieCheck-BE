@@ -1,5 +1,6 @@
 package com.movie.moviecheck.controller;
 
+import com.movie.moviecheck.dto.GenreDto;
 import com.movie.moviecheck.dto.MovieDto; // DTO 클래스
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.service.MovieService; // 서비스 클래스 필요
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -28,8 +30,7 @@ public class MovieController {
 
     // 영화 정보 가져오기
     @GetMapping
-    public ResponseEntity<Map<String, Object>> goTogetAllMovies(
-        @PageableDefault(size=10) Pageable pageable) {
+    public ResponseEntity<Map<String, Object>> goTogetAllMovies(@PageableDefault(size=10) Pageable pageable) {
         Map<String, Object> result = movieService.getAllMovies(pageable);
         return ResponseEntity.ok(result);
     }
@@ -52,5 +53,11 @@ public class MovieController {
     public ResponseEntity<Map<String, Object>> searchMovies(@RequestBody MovieDto movieDto, @PageableDefault(size=10) Pageable pageable) {
         Map<String, Object> response = movieService.searchMoviesByTitle(movieDto, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // 장르별 영화 가져오기
+    @PostMapping("/genre")
+    public Page<MovieDto> goTogetMoviesByGenres(@RequestBody GenreDto genre, Pageable pageable) {
+        return movieService.getMoviesByGenre(genre, pageable);
     }
 }

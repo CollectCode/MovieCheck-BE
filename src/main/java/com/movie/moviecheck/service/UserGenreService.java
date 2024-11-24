@@ -11,14 +11,12 @@ import org.springframework.stereotype.Service;
 import com.movie.moviecheck.controller.WrapperClass;
 import com.movie.moviecheck.converter.GenreConvertor;
 import com.movie.moviecheck.converter.UserConvertor;
-import com.movie.moviecheck.converter.UserGenreConvertor;
 import com.movie.moviecheck.dto.GenreDto;
 import com.movie.moviecheck.dto.UserDto;
 import com.movie.moviecheck.embedded.UserGenreId;
 import com.movie.moviecheck.model.Genre;
 import com.movie.moviecheck.model.User;
 import com.movie.moviecheck.model.UserGenre;
-import com.movie.moviecheck.repository.GenreRepository;
 import com.movie.moviecheck.repository.UserGenreRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,9 +31,7 @@ public class UserGenreService {
 
     private final UserService userService;
     private final UserConvertor userConvertor;
-    private final UserGenreConvertor userGenreConvertor;
     private final UserGenreRepository userGenreRepository;
-    private final GenreRepository genreRepository;
     private final GenreConvertor genreConvertor;
     private final GenreService genreService;
 

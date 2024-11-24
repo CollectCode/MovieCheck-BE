@@ -23,8 +23,9 @@ public class ReviewDto {
     private LocalDateTime reviewTime; // 리뷰 시간
     private Integer reviewLike;       // 긍정적인 평가 수
 
-    public ReviewDto(ReviewId id, Integer userKey, String reviewContent, LocalDateTime reviewTime,
+    public ReviewDto(Integer reviewKey, Integer userKey, String reviewContent, LocalDateTime reviewTime,
             Integer reviewLike) {
+                this.reviewKey = reviewKey;
                 this.userKey = userKey;
                 this.reviewContent = reviewContent;
                 this.reviewTime = reviewTime;

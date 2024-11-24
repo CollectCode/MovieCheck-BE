@@ -8,10 +8,12 @@ import com.movie.moviecheck.util.ReviewRepositoryCustom;
 
 import java.util.List;
 
-public interface ReviewRepository extends JpaRepository<Review,ReviewId>, ReviewRepositoryCustom  {
+public interface ReviewRepository extends JpaRepository<Review,Integer>, ReviewRepositoryCustom  {
     List<Review> findByMovie_MovieKey(String movieKey); // 특정 영화의 리뷰 조회
     List<Review> findByUser_UserKey(int userKey); // 특정 사용자의 리뷰 조회
     Review findByUser_userKeyAndMovie_MovieKey(Integer userKey, String movieKey);
+    Review findByReviewKey(Integer reviewKey);
+
 }
 
 

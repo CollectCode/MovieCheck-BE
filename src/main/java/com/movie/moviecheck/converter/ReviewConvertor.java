@@ -39,7 +39,7 @@ public class ReviewConvertor {
     
         // Review 엔티티 생성 및 반환
         return Review.builder()
-                .id(reviewId)
+                .reviewKey(reviewDto.getReviewKey())
                 .movie(movie)
                 .user(user)
                 .reviewContent(reviewDto.getReviewContent())
@@ -54,7 +54,7 @@ public class ReviewConvertor {
             return null; // null 체크
         }
         return ReviewDto.builder()
-                   .movieKey(review.getMovie().getMovieKey())
+                   .reviewKey(review.getReviewKey())
                    .userKey(review.getUser().getUserKey())
                    .reviewContent(review.getReviewContent())
                    .reviewTime(review.getReviewTime())
