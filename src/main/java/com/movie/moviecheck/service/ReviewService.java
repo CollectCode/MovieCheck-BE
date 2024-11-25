@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.movie.moviecheck.converter.ReviewConvertor;
 import com.movie.moviecheck.dto.ReviewDto;
 import com.movie.moviecheck.model.Review;
+import com.movie.moviecheck.model.User;
 import com.movie.moviecheck.repository.ReviewRepository;
+import com.movie.moviecheck.repository.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -23,6 +25,7 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReviewConvertor reviewConvertor;
+    private final UserRepository userRepository;
 
     // 리뷰 추가
     public ResponseEntity<ReviewDto> addReview(ReviewDto reviewDto, HttpServletRequest request) {
@@ -89,8 +92,25 @@ public class ReviewService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 삭제 권한 없음
         }
         try {
+            // 삭제되는 리뷰의 좋아요 수
+            int deletedReviewLikes = review.getReviewLike() != null ? review.getReviewLike() : 0;
+
             // 리뷰 삭제
             reviewRepository.delete(review);
+            // 작성자의 모든 리뷰 좋아요 수 재계산
+            User reviewUser = review.getUser();
+            int totalLikes = 0;
+
+            List<Review> userReviews = reviewRepository.findByUser_UserKey(reviewUser.getUserKey());
+            for (Review userReview : userReviews) {
+                if (userReview.getReviewLike() != null) {
+                    totalLikes += userReview.getReviewLike();
+                }
+            }
+            // 작성자 등급 재조정
+            String newGrade = calculateUserGrade(totalLikes);
+            reviewUser.setUserGrade(newGrade);
+            userRepository.save(reviewUser);
             return ResponseEntity.noContent().build(); // 성공적으로 삭제
         } catch (Exception e) {
             System.out.println(e);
@@ -115,5 +135,20 @@ public class ReviewService {
     // 특정 리뷰 조회
     public Review getReviewByKey(Integer reviewKey) {
         return reviewRepository.findByReviewKey(reviewKey);
+    }
+
+    // 등급 계산 메서드
+    public String calculateUserGrade(int totalLikes) {
+        if (totalLikes >= 500) {
+            return "박평식";
+        } else if (totalLikes >= 100) {
+            return "감독";
+        } else if (totalLikes >= 50) {
+            return "주연";
+        } else if (totalLikes >= 2) {
+            return "조연";
+        } else {
+            return "관람객";
+        }
     }
 }
