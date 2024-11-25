@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +28,9 @@ public class Actor {
 
     @Column(name = "actor_image", length = 255)
     private String actorImage;
+
+    // @Column(name = "actor_overview", length = 10000)
+    // private String actorOverview;
 
     @OneToMany(mappedBy = "actor")
     private List<MovieActor> movieActor;

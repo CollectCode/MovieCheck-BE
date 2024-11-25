@@ -1,6 +1,12 @@
 package com.movie.moviecheck.controller;
 
+import java.util.Optional;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.movie.moviecheck.dto.ActorDto;
+import com.movie.moviecheck.service.ActorService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -9,21 +15,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ActorController {
 
-    // 사용 안함
+    private final ActorService actorService;
 
-    // // 모든 배우 조회
-    // // /api/actors
-    // @GetMapping
-    // public ResponseEntity<List<Actor>> getAllActors() {
-    //     List<Actor> actors = actorService.getAllActors();
-    //     return ResponseEntity.ok(actors);
-    // }
-
-    // // 특정 배우 조회
-    // // /api/actors/{actorKey}
-    // @GetMapping("/{actorKey}")
-    // public ResponseEntity<Actor> getActorById(@PathVariable String actorKey) {
-    //     Optional<Actor> actor = actorService.getActorById(actorKey);
-    //     return actor.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    // }
+    // 특정 배우 조회
+    // /api/actors/{actorKey}
+    @PostMapping("/detail")
+    public ResponseEntity<ActorDto> goToGetActorById(@RequestBody ActorDto actorDto) {
+        Optional<ActorDto> actorDtoResult = actorService.getActor(actorDto);
+        return actorDtoResult
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
