@@ -36,5 +36,4 @@ public class UserGenre {
     @JoinColumn(name = "genre_key")
     private Genre genre; // Genre 엔티티와의 관계
 
-    // 추가적인 메서드가 필요할 경우 작성
 }

@@ -1,7 +1,6 @@
 package com.movie.moviecheck.service;
 import org.springframework.stereotype.Service;
 
-import com.movie.moviecheck.controller.ActorController;
 import com.movie.moviecheck.converter.ActorConvertor;
 import com.movie.moviecheck.dto.ActorDto;
 import com.movie.moviecheck.model.Actor;

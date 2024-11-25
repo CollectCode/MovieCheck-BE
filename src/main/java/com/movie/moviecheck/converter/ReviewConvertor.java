@@ -31,7 +31,7 @@ public class ReviewConvertor {
         User user = userService.findByKey(reviewDto.getUserKey());
     
         // ReviewId 생성
-        ReviewId reviewId = new ReviewId(reviewDto.getMovieKey(), reviewDto.getUserKey());
+        // ReviewId reviewId = new ReviewId(reviewDto.getMovieKey(), reviewDto.getUserKey());
     
         // Review 엔티티 생성 및 반환
         return Review.builder()
