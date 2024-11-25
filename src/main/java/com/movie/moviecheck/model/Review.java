@@ -1,9 +1,12 @@
 package com.movie.moviecheck.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -42,6 +46,7 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "user_key", nullable = false)
+    @JsonBackReference
     private User user; // User 엔티티와의 관계
 
     @Column(name = "review_content", nullable = false, length = 255)
@@ -52,4 +57,12 @@ public class Review {
 
     @Column(name = "review_like", nullable = false)
     private Integer reviewLike;
+
+    // 수정된 필드: UserLike와의 관계 (컬렉션 타입으로 변경)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserLike> userLikes = new ArrayList<>();
+
+    // 수정된 필드: Comment와의 관계 (컬렉션 타입으로 변경)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 }

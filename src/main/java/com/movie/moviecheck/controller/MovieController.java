@@ -2,23 +2,20 @@ package com.movie.moviecheck.controller;
 
 import com.movie.moviecheck.dto.GenreDto;
 import com.movie.moviecheck.dto.MovieDto; // DTO 클래스
-import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.service.MovieService; // 서비스 클래스 필요
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,7 +27,9 @@ public class MovieController {
 
     // 영화 정보 가져오기
     @GetMapping
-    public ResponseEntity<Map<String, Object>> goTogetAllMovies(@PageableDefault(size=10) Pageable pageable) {
+    public ResponseEntity<Map<String, Object>> goTogetAllMovies(@RequestParam(name="page") int page,
+                                                                @RequestParam(name="size") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"movieScore"));
         Map<String, Object> result = movieService.getAllMovies(pageable);
         return ResponseEntity.ok(result);
     }
@@ -49,9 +48,10 @@ public class MovieController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/search")
-    public ResponseEntity<Map<String, Object>> searchMovies(@RequestBody MovieDto movieDto, @PageableDefault(size=10) Pageable pageable) {
-        Map<String, Object> response = movieService.searchMoviesByTitle(movieDto, pageable);
+    @GetMapping("/search")
+    public ResponseEntity<Map<String, Object>> searchMovies(@RequestParam(name = "size")int size,@RequestParam(name="page")int page,@RequestParam(name="keyword")String word) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"movieScore"));
+        Map<String, Object> response = movieService.searchMoviesByTitle(word, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -42,7 +41,7 @@ public class Movie {
     private String moviePoster;
 
     @Column(name = "movie_score", nullable = true)
-    private double movieScore = 0;  // 기본값 0
+    private double movieScore = 0.0;  // 기본값 0
 
     @Column(name = "movie_runtime")
     private int movieRuntime;

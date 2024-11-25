@@ -58,8 +58,15 @@ public class User {
     @JsonManagedReference
     private List<UserGenre> userGenre;
 
-    @OneToMany(mappedBy = "user")
-    private List<Review> review;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserLike> userLikes;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Review> reviews;
 
 
     @Transient

@@ -1,24 +1,15 @@
 package com.movie.moviecheck.service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException; // User 모델 클래스 필요
 import java.nio.file.Files;
 import java.util.Base64;
-import java.util.HashMap; // UserRepository 필요
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.movie.moviecheck.controller.WrapperClass;
@@ -40,9 +31,6 @@ public class UserService {
 
     private final UserRepository userRepository; // UserRepository 주입
     private final UserConvertor userConvertor;
-
-    private static Map<String, User> userDatabase = new HashMap<>(); // 이메일로 사용자 관리
-    private static Map<String, User> nameDatabase = new HashMap<>(); // 닉네임으로 사용자 관리
 
     // 로그인 로직
     public ResponseEntity<WrapperClass<UserDto>> login(
@@ -132,7 +120,7 @@ public class UserService {
 
     // 닉네임 중복체크 로직
     public ResponseEntity<WrapperClass<UserDto>> isNameExist(UserDto userDto) {
-        String msg = "중복된 닉네임 입니다.";
+        String msg = "사용 불가능한 닉네임 입니다.";
         if (!isNameExists(userDto.getUserName())) {
             msg = "사용 가능한 닉네임 입니다.";
             return ResponseEntity
@@ -156,10 +144,10 @@ public class UserService {
                 // 서버 메모리에서 세션 ID 확인 (필요시)
                 String sessionId = getSession(userKey);
     
-                // 사용자 정보 가져오기 및 Base64 이미지 변환
+                // 사용자 정보 가져오기
                 UserDto userDto = userConvertor.convertToDto(user);
-                if(userDto.getUserProfile().equals("")){
-                    userDto.setUserProfile("http://localhost:8080/images/movies/default.png");
+                if(userDto.getUserProfile()==null || userDto.getUserProfile().equals("")){
+                    userDto.setUserProfile("http://localhost:8080/images/users/default.PNG");
                 }
                 msg = "마이페이지 로딩 성공.";
                 return ResponseEntity.ok(new WrapperClass<>(userDto, msg)); // 사용자 정보를 메시지와 함께 반환

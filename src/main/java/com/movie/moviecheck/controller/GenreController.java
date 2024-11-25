@@ -9,7 +9,6 @@ import com.movie.moviecheck.service.GenreService;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor

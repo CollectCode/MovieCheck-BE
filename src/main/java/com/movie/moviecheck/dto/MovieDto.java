@@ -2,9 +2,6 @@ package com.movie.moviecheck.dto;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.movie.moviecheck.model.Director;
-import com.movie.moviecheck.model.Review;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

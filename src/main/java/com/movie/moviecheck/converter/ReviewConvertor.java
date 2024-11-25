@@ -3,14 +3,11 @@ package com.movie.moviecheck.converter;
 import org.springframework.stereotype.Component;
 
 import com.movie.moviecheck.dto.ReviewDto;
-import com.movie.moviecheck.dto.UserDto;
 import com.movie.moviecheck.embedded.ReviewId;
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.model.User;
 import com.movie.moviecheck.repository.MovieRepository;
-import com.movie.moviecheck.service.GenreService;
-import com.movie.moviecheck.service.MovieService;
 import com.movie.moviecheck.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReviewConvertor {
 
-    private final MovieService movieService;
     private final MovieRepository movieRepository;
     private final UserService userService;
 

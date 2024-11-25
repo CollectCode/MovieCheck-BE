@@ -58,7 +58,7 @@ public class MovieService {
                                                         String moviePoster = movie.getMoviePoster();
                                                         if (moviePoster.equals("")) {
                                                             moviePoster = "http://localhost:8080/images/movies/default.png";}
-                                                        dto.put("movieImage", moviePoster);
+                                                        dto.put("moviePoster", moviePoster);
                                                         return dto;
                                                     })
                                                     .collect(Collectors.toList());
@@ -228,9 +228,9 @@ public class MovieService {
     }
 
     // 영화 검색 메서드 (페이징 적용)
-    public Map<String, Object> searchMoviesByTitle(MovieDto movieDto, Pageable pageable) {
+    public Map<String, Object> searchMoviesByTitle(String word, Pageable pageable) {
         // 1. 제목 부분 검색 (대소문자 무시 + 페이징)
-        Page<Movie> moviesPage = movieRepository.findByMovieTitleContainingIgnoreCase(movieDto.getMovieTitle(), pageable);
+        Page<Movie> moviesPage = movieRepository.findByMovieTitleContainingIgnoreCase(word, pageable);
 
         // 2. 검색된 영화 리스트를 DTO로 변환
         Page<MovieDto> movieDtosPage = moviesPage.map(movie -> 

@@ -3,17 +3,14 @@ package com.movie.moviecheck.converter;
 import com.movie.moviecheck.dto.GenreMovieDto;
 import com.movie.moviecheck.embedded.GenreMovieId;
 import com.movie.moviecheck.model.Genre;
-import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.GenreMovie;
 import com.movie.moviecheck.service.GenreService;
-import com.movie.moviecheck.service.MovieService;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class GenreMovieConvertor {
 
-    private final MovieService movieService;
     private final GenreService genreService;
 
     public GenreMovieDto convertToDto(GenreMovie movieGenre){

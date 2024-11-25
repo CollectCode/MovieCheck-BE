@@ -1,21 +1,14 @@
 package com.movie.moviecheck.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.movie.moviecheck.service.ActorService;
-import com.movie.moviecheck.model.Actor;
 
 import lombok.RequiredArgsConstructor;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/actors")
 @RequiredArgsConstructor
 public class ActorController {
 
-    private final ActorService actorService;
     // 사용 안함
 
     // // 모든 배우 조회

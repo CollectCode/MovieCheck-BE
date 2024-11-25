@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.movie.moviecheck.converter.ReviewConvertor;
 import com.movie.moviecheck.dto.ReviewDto;
@@ -23,41 +24,62 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewConvertor reviewConvertor;
 
-
-    // 추후 수정
     // 리뷰 추가
     public ResponseEntity<ReviewDto> addReview(ReviewDto reviewDto, HttpServletRequest request) {
         // 1. 세션에서 userKey 가져오기
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("userKey") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                                .body(null); // 로그인 필요 응답
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 로그인 필요 응답
         }
         Integer userKey = (Integer) session.getAttribute("userKey");
-        // 2. ReviewDto에 userKey 설정
+    
+        // 2. 기존 리뷰 확인
+        if (reviewDto.getReviewKey() != null) {
+            Review existingReview = reviewRepository.findById(reviewDto.getReviewKey())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 리뷰를 찾을 수 없습니다. reviewKey: " + reviewDto.getReviewKey()));
+    
+            // 2.1 리뷰 작성자 확인
+            if (!existingReview.getUser().getUserKey().equals(userKey)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 권한 없음 응답
+            }
+            // 2.2 리뷰 내용 수정
+            existingReview.setReviewContent(reviewDto.getReviewContent());
+            existingReview.setReviewTime(LocalDateTime.now());
+    
+            // 2.3 저장 후 DTO 변환 및 반환
+            Review updatedReview = reviewRepository.save(existingReview);
+            ReviewDto responseDto = reviewConvertor.convertToDto(updatedReview);
+            return ResponseEntity.ok(responseDto);
+        }
+    
+        // 3. 새로운 리뷰 작성
         reviewDto.setUserKey(userKey);
         reviewDto.setReviewTime(LocalDateTime.now());
         reviewDto.setReviewLike(0);
-        // 3. Review 엔티티 변환 및 저장
+    
+        // 4. Review 엔티티 변환 및 저장
         Review review = reviewConvertor.convertToEntity(reviewDto);
         Review savedReview = reviewRepository.save(review);
-        // 4. 저장된 Review 엔티티를 ReviewDto로 변환하여 반환
+    
+        // 5. 저장된 Review 엔티티를 ReviewDto로 변환하여 반환
         ReviewDto responseDto = reviewConvertor.convertToDto(savedReview);
-        // 5. ResponseEntity로 반환
         return ResponseEntity.ok(responseDto);
     }
-
+    
 
     // 리뷰 삭제
-    public ResponseEntity<Void> deleteReview(HttpServletRequest request, ReviewDto reviewDto) {
+    public ResponseEntity<ReviewDto> deleteReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
+
         // 세션에서 userKey 가져오기
         HttpSession session = request.getSession(false); // 세션이 없으면 null 반환
         if (session == null || session.getAttribute("userKey") == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 인증 실패 응답
         }
         Integer userKey = (Integer) session.getAttribute("userKey");
+
         // 리뷰 삭제 로직
-        Review review = reviewRepository.findByUser_userKeyAndMovie_MovieKey(userKey, reviewDto.getMovieKey());
+        Review review = reviewRepository.findByReviewKey(reviewDto.getReviewKey());
+
         // 리뷰가 없으면 404 응답
         if (review == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 리뷰 없음
@@ -71,12 +93,11 @@ public class ReviewService {
             reviewRepository.delete(review);
             return ResponseEntity.noContent().build(); // 성공적으로 삭제
         } catch (Exception e) {
+            System.out.println(e);
             // 예외 발생 시 500 응답
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
-
 
     // 특정 영화의 모든 리뷰 조회
     public List<ReviewDto> getReviewsByMovie(ReviewDto reviewDto) {

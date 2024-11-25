@@ -26,8 +26,8 @@ public class ReviewController {
     // 리뷰 삭제
     // /api/reviews/delete
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
-        return reviewService.deleteReview(request, reviewDto);
+    public ResponseEntity<ReviewDto> deleteReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
+        return reviewService.deleteReview(reviewDto,request);
     }
 
 }

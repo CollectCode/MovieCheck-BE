@@ -1,14 +1,8 @@
 package com.movie.moviecheck.controller;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity; // User 모델 클래스 필요
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping; // 서비스 클래스 필요
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.movie.moviecheck.converter.UserConvertor;
 import com.movie.moviecheck.dto.UserDto;
 import com.movie.moviecheck.service.UserService;
 
@@ -31,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 
     private final UserService userService; // UserService 주입
-    private final UserConvertor userConvertor;
 
     // 로그인
     @PostMapping("/login")

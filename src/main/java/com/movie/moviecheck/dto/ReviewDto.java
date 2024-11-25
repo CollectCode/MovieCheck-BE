@@ -8,8 +8,6 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-import com.movie.moviecheck.embedded.ReviewId;
-
 @Getter
 @Setter
 @Builder
