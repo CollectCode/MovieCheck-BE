@@ -1,5 +1,8 @@
 package com.movie.moviecheck.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,10 +17,23 @@ import lombok.Setter;
 public class UserDto {
     
     private Integer userKey;       // 회원번호
+
+    @Email       
+    @NotNull
+    @Size(min=17,max=32)
     private String userEmail;      // 회원 이메일
+
+    @NotNull
+    @Size(min=8,max=20)
     private String userPassword;   // 회원 비밀번호
+    
+    @NotNull
+    @Size(min=3,max=20)
     private String userName;       // 사용자 이름 (닉네임)
+    
     private String userContent;    // 한줄소개
+    
+    @NotNull
     private int userGender;
     private String userProfile;
     private String userGrade = "관람객";

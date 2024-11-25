@@ -43,21 +43,23 @@ public class MovieController {
 
     // 사용자가 선호하는 장르 영화 가져오기
     @GetMapping("/user")
-    public ResponseEntity<Map<String, Object>> getMoviesByUserPreferences(HttpServletRequest request, @PageableDefault(size=10) Pageable pageable) {
-        Map<String, Object> response = movieService.getMoviesByUserPreferences(request, pageable);
+    public ResponseEntity<Map<String, Object>> getMoviesByUserPreferences(HttpServletRequest request,
+    @RequestParam(name = "size")int size,@RequestParam(name="page")int page) {
+        Map<String, Object> response = movieService.getMoviesByUserPreferences(request, page,size);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Map<String, Object>> searchMovies(@RequestParam(name = "size")int size,@RequestParam(name="page")int page,@RequestParam(name="keyword")String word) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC,"movieScore"));
+    public ResponseEntity<Map<String, Object>> searchMovies(@RequestParam(name="size") int size, @RequestParam(name="page") int page, @RequestParam(name = "keyword") String word) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "movieScore"));
         Map<String, Object> response = movieService.searchMoviesByTitle(word, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 장르별 영화 가져오기
-    @PostMapping("/genre")
-    public Page<MovieDto> goTogetMoviesByGenres(@RequestBody GenreDto genre, Pageable pageable) {
-        return movieService.getMoviesByGenre(genre, pageable);
+    @GetMapping("/genre")
+    public ResponseEntity<Map<String, Object>> goTogetMoviesByGenres(@RequestParam(name="size") int size, @RequestParam(name="page") int page, @RequestParam(name="genre") String genre) {
+        Map<String, Object> response = movieService.getMoviesByGenre(genre, page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

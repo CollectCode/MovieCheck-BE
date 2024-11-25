@@ -16,6 +16,7 @@ import com.movie.moviecheck.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,7 +34,7 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<WrapperClass<UserDto>> goToCreateUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<WrapperClass<UserDto>> goToCreateUser(@Valid @RequestBody UserDto userDto) {
         return userService.createUser(userDto);
     }
 

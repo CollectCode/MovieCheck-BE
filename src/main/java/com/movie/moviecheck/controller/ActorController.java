@@ -18,7 +18,7 @@ public class ActorController {
     private final ActorService actorService;
 
     // 특정 배우 조회
-    // /api/actors/{actorKey}
+    // /api/actors/detail
     @PostMapping("/detail")
     public ResponseEntity<ActorDto> goToGetActorById(@RequestBody ActorDto actorDto) {
         Optional<ActorDto> actorDtoResult = actorService.getActor(actorDto);

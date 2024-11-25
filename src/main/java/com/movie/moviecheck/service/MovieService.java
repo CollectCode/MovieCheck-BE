@@ -11,10 +11,12 @@ import com.movie.moviecheck.dto.ReviewDto;
 import com.movie.moviecheck.dto.UserDto;
 import com.movie.moviecheck.model.Actor;
 import com.movie.moviecheck.model.Director;
+import com.movie.moviecheck.model.Genre;
 import com.movie.moviecheck.model.GenreMovie;
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.UserGenre;
 import com.movie.moviecheck.repository.GenreMovieRepository;
+import com.movie.moviecheck.repository.GenreRepository;
 import com.movie.moviecheck.repository.MovieRepository;
 import com.movie.moviecheck.repository.UserGenreRepository;
 
@@ -25,13 +27,17 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +51,9 @@ public class MovieService {
     private final GenreConvertor genreConvertor;
     private final UserGenreRepository userGenreRepository;
     private final GenreMovieRepository genreMovieRepository;
+    private final GenreMovieService genreMovieService;
+    private final GenreService genreService;
+    private final GenreRepository genreRepository;
 
     public Map<String, Object> getAllMovies(Pageable pageable) {
         // 1. 모든 영화 가져오기
@@ -74,67 +83,67 @@ public class MovieService {
     
     // 영화 디테일에서 사용
     public MovieDto getMovies(String movieKey) {
-    // 영화 엔티티 조회
-    Movie movie = movieRepository.findByMovieKey(movieKey);
+        // 영화 엔티티 조회
+        Movie movie = movieRepository.findByMovieKey(movieKey);
 
-    // 영화 정보를 DTO로 변환
-    MovieDto movieDto = movieConvertor.convertToDto(movie);
+        // 영화 정보를 DTO로 변환
+        MovieDto movieDto = movieConvertor.convertToDto(movie);
 
-    // 영화에 속한 배우 정보 가져오기
-    List<ActorDto> actors = movie.getMovieActor().stream()
-            .map(movieActor -> {
-                Actor actor = movieActor.getActor();
-                String actorImage = actor.getActorImage();
-                if(actorImage.equals("")){
-                    actorImage = "http://localhost:8080/images/actors/default.png";
-                }
-                return new ActorDto(
-                        actor.getActorKey(),
-                        actor.getActorName(),
-                        actorImage
-                );
-            })
-            .collect(Collectors.toList());
-
-    // 해당 영화의 리뷰 가져오기    
-    List<ReviewDto> reviews = movie.getReview().stream()
-                .map(review -> {
-                    return new ReviewDto(
-                            review.getReviewKey(),
-                            review.getUser().getUserKey(),
-                            review.getReviewContent(),
-                            review.getReviewTime(),
-                            review.getReviewLike()
+        // 영화에 속한 배우 정보 가져오기
+        List<ActorDto> actors = movie.getMovieActor().stream()
+                .map(movieActor -> {
+                    Actor actor = movieActor.getActor();
+                    String actorImage = actor.getActorImage();
+                    if(actorImage.equals("")){
+                        actorImage = "http://localhost:8080/images/actors/default.png";
+                    }
+                    return new ActorDto(
+                            actor.getActorKey(),
+                            actor.getActorName(),
+                            actorImage
                     );
                 })
+                .collect(Collectors.toList());
+
+        // 해당 영화의 리뷰 가져오기    
+        List<ReviewDto> reviews = movie.getReview().stream()
+                    .map(review -> {
+                        return new ReviewDto(
+                                review.getReviewKey(),
+                                review.getUser().getUserKey(),
+                                review.getReviewContent(),
+                                review.getReviewTime(),
+                                review.getReviewLike()
+                        );
+                    })
+                    .toList();
+
+        // 감독 정보 가져오기
+        Director director = movie.getDirector();
+        DirectorDto directorDto = null;
+        if (director != null) {
+            String directorImage = director.getDirectorImage();
+        if(directorImage.equals("")){
+            directorImage = "http://localhost:8080/images/directors/default.png";}
+            directorDto = new DirectorDto(
+                    director.getDirectorName(),
+                    directorImage
+            );
+        }
+
+        // 영화 장르 가져오기
+        List<GenreMovie> genreMovies = genreMovieRepository.findByMovie_MovieKey(movieKey);
+        List<String> genreKeys = genreMovies.stream()
+                .map(genreMovie -> genreMovie.getGenre().getGenreName()) // 필요한 정보로 변경
                 .toList();
 
-    // 감독 정보 가져오기
-    Director director = movie.getDirector();
-    DirectorDto directorDto = null;
-    if (director != null) {
-        String directorImage = director.getDirectorImage();
-    if(directorImage.equals("")){
-        directorImage = "http://localhost:8080/images/directors/default.png";}
-        directorDto = new DirectorDto(
-                director.getDirectorName(),
-                directorImage
-        );
-    }
+        // DTO에 데이터 설정
+        movieDto.setActorDto(actors); // 배우 추가
+        movieDto.setReviewDto(reviews); // 리뷰 추가
+        movieDto.setDirectorDto(directorDto); // 감독 추가
+        movieDto.setGenresName(genreKeys); // 장르 추가
 
-    // 영화 장르 가져오기
-    List<GenreMovie> genreMovies = genreMovieRepository.findByMovie_MovieKey(movieKey);
-    List<String> genreKeys = genreMovies.stream()
-            .map(genreMovie -> genreMovie.getGenre().getGenreName()) // 필요한 정보로 변경
-            .toList();
-
-    // DTO에 데이터 설정
-    movieDto.setActorDto(actors); // 배우 추가
-    movieDto.setReviewDto(reviews); // 리뷰 추가
-    movieDto.setDirectorDto(directorDto); // 감독 추가
-    movieDto.setGenresName(genreKeys); // 장르 추가
-
-    return movieDto;
+        return movieDto;
     }
 
     // 영화 디테일 조회
@@ -158,7 +167,7 @@ public class MovieService {
     
 
     // 사용자가 선호하는 영화 가져오는 메서드
-    public Map<String, Object> getMoviesByUserPreferences(HttpServletRequest request, Pageable pageable) {
+    public Map<String, Object> getMoviesByUserPreferences(HttpServletRequest request,int page, int size) {
         // 1. 세션에서 userKey 가져오기
         HttpSession session = request.getSession(false);
         Integer userKey = (Integer) session.getAttribute("userKey");
@@ -170,7 +179,7 @@ public class MovieService {
         List<GenreDto> genres = getUserGenres(user);
 
         // 4. 선호 장르에 해당하는 영화 가져오기 (페이징 적용)
-        Page<MovieDto> moviePage = getMoviesByGenres(genres, pageable);
+        Page<MovieDto> moviePage = getMoviesByGenres(genres, page,size);
 
         // 5. 결과를 HashMap에 담아서 반환
         Map<String, Object> result = new HashMap<>();
@@ -190,41 +199,68 @@ public class MovieService {
     }
 
     // 여러 개의 장르 영화 가져오는 메서드 (페이징 추가)
-    public Page<MovieDto> getMoviesByGenres(List<GenreDto> genres, Pageable pageable) {
+    public Page<MovieDto> getMoviesByGenres(List<GenreDto> genres, int page, int size) {
         // 장르 키 목록 추출
         List<String> genreKeys = genres.stream()
                                     .map(GenreDto::getGenreKey)
                                     .toList();
 
-        // 페이징된 결과를 가져오기
-        Page<GenreMovie> genreMoviesPage = genreMovieRepository.findByGenre_GenreKeyIn(genreKeys, pageable);
+        // 결과를 가져오기
+        List<GenreMovie> genreMoviesPage = genreMovieRepository.findByGenre_GenreKeyIn(genreKeys);
+        List<MovieDto> movieDtos = new ArrayList<>();
 
-        // 필요한 필드만 포함한 MovieDto 리스트로 변환
-        return genreMoviesPage.map(genreMovie -> 
-            new MovieDto(
-                genreMovie.getMovie().getMovieKey(),
-                genreMovie.getMovie().getMovieTitle(),
-                genreMovie.getMovie().getMoviePoster()
-            )
-        );
+        for(GenreMovie genreMovie : genreMoviesPage)    {
+            Movie movie = genreMovie.getMovie();
+            MovieDto movieDto = movieConvertor.convertToDto(movie);
+            movieDtos.add(movieDto);
+        }
+
+        int totalSize = movieDtos.size();
+        int start = Math.min(page*size, totalSize);
+        int end = Math.min(start + size, totalSize);
+
+        List<MovieDto> pagedList = movieDtos.subList(start, end);
+        Pageable pageables = PageRequest.of(page, size);
+        Page<MovieDto> pageable = new PageImpl<>(pagedList, pageables, totalSize);
+
+        return pageable;
     }
 
-    // 한 장르 영화 가져오는 메서드 (페이징 추가)
-    public Page<MovieDto> getMoviesByGenre(GenreDto genreDto, Pageable pageable) {
-        // 장르 키 목록 추출
-        String genreKey = genreDto.getGenreKey();
 
+    // 한 장르 영화 가져오는 메서드 (페이징 추가)
+    public Map<String, Object> getMoviesByGenre(String genre, int page, int size) {
+        // 장르 키 목록 추출
+        Genre getGenre = null;
         // 페이징된 결과를 가져오기
-        Page<GenreMovie> genreMoviesPage = genreMovieRepository.findByGenre_GenreKey(genreKey, pageable);
+        Optional<Genre> og = genreService.getGenreByName(genre);
+        if(og.isPresent())  {
+            getGenre = og.get();
+        }
+        List<GenreMovie> genreMovies = genreMovieService.getMoviesByGenreKey(getGenre.getGenreKey());
+        List<MovieDto> movieDtos = new ArrayList<>();
+
+        for(GenreMovie genreMovie : genreMovies)    {
+            Movie movie = genreMovie.getMovie();
+            MovieDto movieDto = movieConvertor.convertToDto(movie);
+            movieDtos.add(movieDto);
+        }
         
         // 필요한 필드만 포함한 MovieDto 리스트로 변환
-        return genreMoviesPage.map(genreMovie -> 
-            new MovieDto(
-                genreMovie.getMovie().getMovieKey(),
-                genreMovie.getMovie().getMovieTitle(),
-                genreMovie.getMovie().getMoviePoster()
-            )
-        );
+        int totalSize = movieDtos.size();
+        int start = Math.min(page*size, totalSize);
+        int end = Math.min(start+size, totalSize);
+
+        List<MovieDto> pagedList = movieDtos.subList(start, end);
+        Pageable pageables = PageRequest.of(page, size);
+        Page<MovieDto> pageable = new PageImpl<>(pagedList, pageables, totalSize);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("movies", pageable.getContent()); // 현재 페이지의 영화 목록
+        result.put("totalPages", pageable.getTotalPages()); // 총 페이지 수
+        result.put("currentPage", pageable.getNumber()); // 현재 페이지 번호
+        result.put("totalElements", pageable.getTotalElements()); // 총 영화 수
+
+        return result;
     }
 
     // 영화 검색 메서드 (페이징 적용)

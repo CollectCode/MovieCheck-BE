@@ -79,8 +79,9 @@ public class UserService {
     // 회원가입 로직
     public ResponseEntity<WrapperClass<UserDto>> createUser(UserDto userDto) {
         String msg = "회원가입 성공";
-        User user = userConvertor.convertToEntity(userDto);
 
+        User user = userConvertor.convertToEntity(userDto);
+        
         // 비밀번호 해싱
         String hashedPassword = PasswordUtils.hashPassword(user.getUserPassword());
         user.setUserPassword(hashedPassword); // 해싱된 비밀번호로 설정
