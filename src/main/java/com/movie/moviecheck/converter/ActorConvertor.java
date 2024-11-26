@@ -21,6 +21,8 @@ public class ActorConvertor {
                 .actorKey(actor.getActorKey())
                 .actorName(actor.getActorName())
                 .actorImage(actor.getActorImage())
+                .actorBirthplace(actor.getActorBirthplace())
+                .actorBirthday(actor.getActorBirthday())                
                 .movieTitles(actor.getMovieActor() != null ?
                     actor.getMovieActor().stream()
                         .map(MovieActor::getMovie)
