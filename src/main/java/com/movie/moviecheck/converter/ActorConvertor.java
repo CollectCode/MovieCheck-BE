@@ -22,7 +22,14 @@ public class ActorConvertor {
                 .actorName(actor.getActorName())
                 .actorImage(actor.getActorImage())
                 .actorBirthplace(actor.getActorBirthplace())
-                .actorBirthday(actor.getActorBirthday())                
+                .actorBirthday(actor.getActorBirthday())
+                .actorDeathday(actor.getActorDeathday())
+                .movieKeys(actor.getMovieActor() != null ?
+                    actor.getMovieActor().stream()
+                        .map(MovieActor::getMovie)
+                        .map(Movie::getMovieKey)
+                        .collect(Collectors.toList())
+                    : null)
                 .movieTitles(actor.getMovieActor() != null ?
                     actor.getMovieActor().stream()
                         .map(MovieActor::getMovie)
@@ -50,6 +57,7 @@ public class ActorConvertor {
                 actorDto.getActorImage(),
                 actorDto.getActorBirthplace(),
                 actorDto.getActorBirthday(),
+                actorDto.getActorDeathday(),
                 null // MovieActor는 DTO에서 변환하지 않음
         );
     }

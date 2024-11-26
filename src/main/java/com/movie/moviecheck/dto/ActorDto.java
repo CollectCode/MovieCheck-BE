@@ -21,7 +21,9 @@ public class ActorDto {
     private String actorImage;
     private String actorBirthplace;
     private LocalDate actorBirthday;
+    private LocalDate actorDeathday;
 
+    private List<String> movieKeys;
     private List<String> movieTitles;
     private List<String> moviePosters;
 

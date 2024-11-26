@@ -3,7 +3,6 @@ package com.movie.moviecheck.converter;
 import org.springframework.stereotype.Component;
 
 import com.movie.moviecheck.dto.ReviewDto;
-import com.movie.moviecheck.embedded.ReviewId;
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.model.User;

@@ -33,11 +33,11 @@ public class Actor {
     @Column(name = "actor_birthplace", length = 100)
     private String actorBirthplace;
 
-    @Column(name = "actor_birthday", nullable = false)
+    @Column(name = "actor_birthday", nullable = true)   
     private LocalDate actorBirthday;
 
-    // @Column(name = "actor_overview", length = 10000)
-    // private String actorOverview;
+    @Column(name = "actor_deathday", nullable = true)   
+    private LocalDate actorDeathday;
 
     @OneToMany(mappedBy = "actor")
     private List<MovieActor> movieActor;

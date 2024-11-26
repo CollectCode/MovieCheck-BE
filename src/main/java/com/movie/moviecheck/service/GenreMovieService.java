@@ -1,14 +1,11 @@
 package com.movie.moviecheck.service;
 
 import com.movie.moviecheck.controller.WrapperClass;
-import com.movie.moviecheck.dto.GenreDto;
 import com.movie.moviecheck.dto.GenreMovieDto;
 import com.movie.moviecheck.dto.MovieDto;
-import com.movie.moviecheck.dto.UserDto;
 import com.movie.moviecheck.model.Genre;
 import com.movie.moviecheck.model.GenreMovie;
 import com.movie.moviecheck.model.Movie;
-import com.movie.moviecheck.model.UserGenre;
 import com.movie.moviecheck.repository.GenreMovieRepository;
 import com.movie.moviecheck.repository.GenreRepository;
 
