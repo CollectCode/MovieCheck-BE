@@ -16,7 +16,6 @@ import com.movie.moviecheck.model.GenreMovie;
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.UserGenre;
 import com.movie.moviecheck.repository.GenreMovieRepository;
-import com.movie.moviecheck.repository.GenreRepository;
 import com.movie.moviecheck.repository.MovieRepository;
 import com.movie.moviecheck.repository.UserGenreRepository;
 
@@ -53,14 +52,13 @@ public class MovieService {
     private final GenreMovieRepository genreMovieRepository;
     private final GenreMovieService genreMovieService;
     private final GenreService genreService;
-    private final GenreRepository genreRepository;
 
     public Map<String, Object> getAllMovies(Pageable pageable) {
         // 1. 모든 영화 가져오기
-        Page<Movie> movies = movieRepository.findAll(pageable);
+        Page<Movie> movies = movieRepository.findAll(pageable); // TODO DFSDFDSFDSSDADASDASD
         // 2. 필요한 데이터만 포함하는 DTO로 변환
         List<Map<String, Object>> movieDtos = movies.stream()
-                                                    .map(movie -> {
+                                                    .map(movie -> {    
                                                         Map<String, Object> dto = new HashMap<>();
                                                         dto.put("movieKey", movie.getMovieKey());
                                                         dto.put("movieTitle", movie.getMovieTitle());

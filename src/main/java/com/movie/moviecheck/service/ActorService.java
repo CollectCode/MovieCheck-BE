@@ -24,11 +24,12 @@ public class ActorService {
     }
 
     // 특정 배우 조회
-    public Optional<ActorDto> getActor(ActorDto actorDto) {
-        Actor actor = actorRepository.findByActorKey(actorDto.getActorKey());
-        if (actor == null) {
-            return Optional.empty();
+    public ActorDto getActor(String id) {
+        Optional<Actor> oa = actorRepository.findByActorKey(id);
+        Actor actor = null;
+        if (oa.isPresent()) {
+            actor = oa.get();
         }
-        return Optional.of(actorConvertor.convertToDto(actor));
+        return actorConvertor.convertToDto(actor);
     }
 }

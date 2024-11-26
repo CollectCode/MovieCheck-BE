@@ -1,5 +1,6 @@
 package com.movie.moviecheck.model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -27,6 +28,13 @@ public class Actor {
 
     @Column(name = "actor_image", length = 255)
     private String actorImage;
+
+    // actor_birth
+    @Column(name = "actor_birthplace", length = 100)
+    private String actorBirthplace;
+
+    @Column(name = "actor_birthday", nullable = false)
+    private LocalDate actorBirthday;
 
     // @Column(name = "actor_overview", length = 10000)
     // private String actorOverview;

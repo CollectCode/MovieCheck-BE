@@ -2,6 +2,7 @@ package com.movie.moviecheck.controller;
 
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +20,11 @@ public class ActorController {
 
     // 특정 배우 조회
     // /api/actors/detail
-    @PostMapping("/detail")
-    public ResponseEntity<ActorDto> goToGetActorById(@RequestBody ActorDto actorDto) {
-        Optional<ActorDto> actorDtoResult = actorService.getActor(actorDto);
-        return actorDtoResult
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/detail")
+    public ResponseEntity<ActorDto> goToGetActorById(@RequestParam(name="id") String id) {
+        ActorDto result = actorService.getActor(id);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(result);
     }
 }

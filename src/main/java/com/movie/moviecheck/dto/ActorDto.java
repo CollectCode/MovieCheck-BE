@@ -1,5 +1,6 @@
 package com.movie.moviecheck.dto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -18,6 +19,9 @@ public class ActorDto {
     private String actorKey;
     private String actorName;
     private String actorImage;
+    private String actorBirthplace;
+    private LocalDate actorBirthday;
+
     private List<String> movieTitles;
     private List<String> moviePosters;
 

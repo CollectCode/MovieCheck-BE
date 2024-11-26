@@ -46,6 +46,8 @@ public class ActorConvertor {
                 actorDto.getActorKey(),
                 actorDto.getActorName(),
                 actorDto.getActorImage(),
+                actorDto.getActorBirthplace(),
+                actorDto.getActorBirthday(),
                 null // MovieActor는 DTO에서 변환하지 않음
         );
     }
