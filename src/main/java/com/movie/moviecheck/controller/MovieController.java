@@ -33,15 +33,15 @@ public class MovieController {
 
     // 특정 영화 조회
     // /api/movies/detail
-    @PostMapping("/detail")
-    public ResponseEntity<MovieDto> goTogetMovieDetails(@RequestBody MovieDto movieDto) {
-        return movieService.getMovieDetails(movieDto);
+    @GetMapping("/detail")
+    public ResponseEntity<MovieDto> goTogetMovieDetails(@RequestParam(name="id") String movieId) {
+        return movieService.getMovieDetails(movieId);
     }
 
     // 사용자가 선호하는 장르 영화 가져오기
     @GetMapping("/user")
     public ResponseEntity<Map<String, Object>> getMoviesByUserPreferences(HttpServletRequest request,
-    @RequestParam(name = "size")int size,@RequestParam(name="page")int page) {
+    @RequestParam(name = "size")int size,@RequestParam(name="page") int page) {
         Map<String, Object> response = movieService.getMoviesByUserPreferences(request, page,size);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

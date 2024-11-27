@@ -145,17 +145,16 @@ public class MovieService {
     }
 
     // 영화 디테일 조회
-    public ResponseEntity<MovieDto> getMovieDetails(MovieDto movieDto) {
-        String movieKey = movieDto.getMovieKey();
+    public ResponseEntity<MovieDto> getMovieDetails(String movieId) {
     
         // 1. 요청 검증
-        if (movieKey == null || movieKey.isEmpty()) {
+        if (movieId.equals("") || movieId.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
     
         try {
             // 2. Movie 상세 정보 조회
-            MovieDto movieDetails = getMovies(movieKey);
+            MovieDto movieDetails = getMovies(movieId);
             return ResponseEntity.ok(movieDetails);
         } catch (EntityNotFoundException e) {
             // 3. 조회 실패 시 404 Not Found 반환

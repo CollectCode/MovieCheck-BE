@@ -71,25 +71,24 @@ public class CommentService {
     }
     
     // 댓글을 삭제하는 메서드
-public void deleteComment(CommentDto commentDto, HttpServletRequest request) {
-    // 1. 세션에서 userKey 가져오기
-    HttpSession session = request.getSession(false);
-    if (session == null || session.getAttribute("userKey") == null) {
-        throw new IllegalStateException("로그인이 필요합니다.");
+    public void deleteComment(CommentDto commentDto, HttpServletRequest request) {
+        // 1. 세션에서 userKey 가져오기
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userKey") == null) {
+            throw new IllegalStateException("로그인이 필요합니다.");
+        }
+        Integer userKey = (Integer) session.getAttribute("userKey");
+
+        // 2. 댓글 조회
+        Comment comment = commentRepository.findById(commentDto.getCommentKey())
+                .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다. commentKey: " + commentDto.getCommentKey()));
+
+        // 3. 댓글 작성자 확인
+        if (!comment.getUser().getUserKey().equals(userKey)) {
+            throw new IllegalStateException("삭제 권한이 없습니다.");
+        }
+
+        // 4. 댓글 삭제
+        commentRepository.delete(comment);
     }
-    Integer userKey = (Integer) session.getAttribute("userKey");
-
-    // 2. 댓글 조회
-    Comment comment = commentRepository.findById(commentDto.getCommentKey())
-            .orElseThrow(() -> new IllegalArgumentException("해당 댓글을 찾을 수 없습니다. commentKey: " + commentDto.getCommentKey()));
-
-    // 3. 댓글 작성자 확인
-    if (!comment.getUser().getUserKey().equals(userKey)) {
-        throw new IllegalStateException("삭제 권한이 없습니다.");
-    }
-
-    // 4. 댓글 삭제
-    commentRepository.delete(comment);
-}
-
 }
