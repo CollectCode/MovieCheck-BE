@@ -80,6 +80,12 @@ public class UserService {
     public ResponseEntity<WrapperClass<UserDto>> createUser(UserDto userDto) {
         String msg = "회원가입 성공";
 
+        if(userDto.getUserPassword().length() < 7 || userDto.getUserPassword().length() > 21){
+            msg = "비밀번호의 길이는 8글자 ~ 20글자로 해주세요";
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new WrapperClass<>(userDto, msg));
+        }
         User user = userConvertor.convertToEntity(userDto);
         
         // 비밀번호 해싱
@@ -98,7 +104,6 @@ public class UserService {
                     .status(HttpStatus.NOT_FOUND)
                     .body(new WrapperClass<>(null, msg));
         }
-
         // 회원가입이 성공적으로 되었을때
         UserDto sendUser = userConvertor.convertToDto(savedUser);
         return ResponseEntity
@@ -107,32 +112,77 @@ public class UserService {
     }
 
     // 이메일 중복체크 로직
-    public ResponseEntity<WrapperClass<UserDto>> emailCheck(UserDto userDto) {
+    public ResponseEntity<WrapperClass<String>> emailCheck(String userEmail) {
         String msg = "이미 가입되어있는 이메일 입니다.";
-        if (!isEmailExists(userDto.getUserEmail())) {
-            msg = "사용가능한 이메일 입니다.";
+        // 이메일의 형식 검사
+        if(!isValidEmail(userEmail)){
+            msg = "올바르지않은 이메일 형식입니다.";
+            return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(new WrapperClass<>(userEmail,msg));
+        }
+        // 이메일의 길이 검사
+        if (userEmail.length() < 18 || userEmail.length() > 32) {
+            msg = "이메일의 길이는 8글자 ~ 20글자로 해주세요.";
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(new WrapperClass<>(null, msg));
+        }
+        // 이메일이 존재하는지 검사
+        if (!isEmailExists(userEmail)) {
+                msg = "사용가능한 이메일 입니다.";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(userDto, msg));
+                    .body(new WrapperClass<>(userEmail, msg));
         } else {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT) // 409 : 요청이 현재 서버 상태와 충돌할 때
-                    .body(new WrapperClass<>(userDto, msg)); // 이메일이 존재 할 때
+                    .body(new WrapperClass<>(userEmail, msg)); // 이메일이 존재 할 때
         }
     }
 
+    // 이메일 형식 유효성 검사
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        return email != null && email.matches(emailRegex);
+    }
+
+    // 이메일 자음 모음 검사 메서드
+    private boolean isValidUserName(String userName) {
+        // 한글 자음, 모음만 포함된 문자열을 차단하는 정규식
+        String koreanVowelOrConsonantOnlyRegex = "^[ㄱ-ㅎㅏ-ㅣ]*$";
+        // 닉네임이 null이 아니고, 자음/모음만으로 구성되지 않았는지 확인
+        return userName != null && !userName.matches(koreanVowelOrConsonantOnlyRegex);
+    }
+
+
     // 닉네임 중복체크 로직
-    public ResponseEntity<WrapperClass<UserDto>> isNameExist(UserDto userDto) {
+    public ResponseEntity<WrapperClass<String>> isNameExist(String userName) {
         String msg = "사용 불가능한 닉네임 입니다.";
-        if (!isNameExists(userDto.getUserName())) {
+        // 닉네임의 자음 모음 검사
+        if (!isValidUserName(userName)) {
+            msg = "닉네임에 한글 자음 또는 모음만 사용할 수 없습니다.";
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(new WrapperClass<>(null, msg));
+        }
+       // 닉네임의 길이 검사
+        if (userName.length() < 3 || userName.length() > 15) {
+            msg = "닉네임의 길이는 3글자 ~ 15글자로 해주세요.";
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(new WrapperClass<>(null, msg));
+        }
+        // 닉네임이 존재하는지 검사
+        if (!isNameExists(userName)) {
             msg = "사용 가능한 닉네임 입니다.";
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new WrapperClass<>(userDto, msg));
+                    .body(new WrapperClass<>(userName, msg));
         } else {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT) // 409 : 요청이 현재 서버 상태와 충돌할 때
-                    .body(new WrapperClass<>(userDto, msg)); // 닉네임이 존재 할 때
+                    .body(new WrapperClass<>(userName, msg)); // 닉네임이 존재 할 때
         }
     }
 
@@ -272,7 +322,7 @@ public class UserService {
                 File destinationFile = new File(uploadDir, fileName);
                 try {
                     userImage.transferTo(destinationFile);
-                    user.setUserProfile("http://localhost:8080/images/users/" + fileName);
+                    user.setUserProfile("http://192.168.0.69:8080/images/users/" + fileName);
                     saveUser(user);
                     msg = "이미지 업로드 성공";
                     userDto = userConvertor.convertToDto(user);

@@ -1,6 +1,7 @@
 package com.movie.moviecheck.dto;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -18,17 +19,16 @@ public class UserDto {
     
     private Integer userKey;       // 회원번호
 
-    @Email       
-    @NotNull
+    @Email(message = "이메일 형식이 아닙니다.")
+    @NotBlank
     @Size(min=17,max=32)
     private String userEmail;      // 회원 이메일
 
-    @NotNull
-    @Size(min=8,max=20)
+    @NotBlank
     private String userPassword;   // 회원 비밀번호
     
     @NotNull
-    @Size(min=3,max=20)
+    @Size(min=3,max=15)
     private String userName;       // 사용자 이름 (닉네임)
     
     private String userContent;    // 한줄소개

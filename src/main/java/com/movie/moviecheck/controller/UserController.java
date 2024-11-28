@@ -39,15 +39,15 @@ public class UserController {
     }
 
     // 회원가입 이메일 중복체크
-    @PostMapping("/check/email")
-    public ResponseEntity<WrapperClass<UserDto>> goToEmailCheck(@RequestBody UserDto userDto) {
-        return userService.emailCheck(userDto);
+    @GetMapping("/check/email")
+    public ResponseEntity<WrapperClass<String>> goToEmailCheck(@Valid @RequestParam(name="userEmail") String userEmail) {
+        return userService.emailCheck(userEmail);
     }
 
     // 회원가입 닉네임 중복체크
-    @PostMapping("/check/name")
-    public ResponseEntity<WrapperClass<UserDto>> goToExistName(@RequestBody UserDto userDto) {
-        return userService.isNameExist(userDto);
+    @GetMapping("/check/name")
+    public ResponseEntity<WrapperClass<String>> goToExistName(@Valid @RequestParam(name="userName") String userName) {
+        return userService.isNameExist(userName);
     }
 
     // 마이페이지
