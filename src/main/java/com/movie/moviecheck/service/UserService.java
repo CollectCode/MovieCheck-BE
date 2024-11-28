@@ -86,6 +86,8 @@ public class UserService {
         String hashedPassword = PasswordUtils.hashPassword(user.getUserPassword());
         user.setUserPassword(hashedPassword); // 해싱된 비밀번호로 설정
 
+        // 기본 프로필 이미지로 설정
+        user.setUserProfile("http://localhost:8080/images/users/default.PNG");
         // 유저저장
         User savedUser = saveUser(user);
 

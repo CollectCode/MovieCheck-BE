@@ -52,7 +52,7 @@ public class Review {
     @Column(name = "review_content", nullable = false, length = 255)
     private String reviewContent;
 
-    @Column(name = "review_time", nullable = false)
+    @Column(name = "review_time", nullable = false, columnDefinition = "DATETIME")
     private LocalDateTime reviewTime;
 
     @Column(name = "review_like", nullable = false)

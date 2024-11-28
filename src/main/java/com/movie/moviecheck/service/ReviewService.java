@@ -1,17 +1,26 @@
 package com.movie.moviecheck.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.movie.moviecheck.converter.ReviewConvertor;
+import com.movie.moviecheck.converter.UserConvertor;
 import com.movie.moviecheck.dto.ReviewDto;
+import com.movie.moviecheck.dto.UserDto;
+import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.model.User;
+import com.movie.moviecheck.repository.MovieRepository;
 import com.movie.moviecheck.repository.ReviewRepository;
 import com.movie.moviecheck.repository.UserRepository;
 
@@ -24,18 +33,32 @@ import lombok.RequiredArgsConstructor;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final ReviewConvertor reviewConvertor;
+    private final MovieRepository movieRepository;
     private final UserRepository userRepository;
 
+    private final ReviewConvertor reviewConvertor;
+    private final UserConvertor userConvertor;
+    
     // 리뷰 추가
-    public ResponseEntity<ReviewDto> addReview(ReviewDto reviewDto, HttpServletRequest request) {
+    public ResponseEntity<ReviewDto> addReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
         // 1. 세션에서 userKey 가져오기
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("userKey") == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 로그인 필요 응답
         }
+        String movieKey = reviewDto.getMovieKey();
         Integer userKey = (Integer) session.getAttribute("userKey");
-    
+        Optional<Movie> om = movieRepository.findById(movieKey);
+        Optional<User> ou = userRepository.findById(userKey);
+        User user = null;
+        Movie movie = null;
+        if(ou.isPresent())  {
+            user = ou.get();
+        }
+        if(om.isPresent())   {
+            movie = om.get();
+        }
+
         // 2. 기존 리뷰 확인
         if (reviewDto.getReviewKey() != null) {
             Review existingReview = reviewRepository.findById(reviewDto.getReviewKey())
@@ -45,6 +68,7 @@ public class ReviewService {
             if (!existingReview.getUser().getUserKey().equals(userKey)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 권한 없음 응답
             }
+
             // 2.2 리뷰 내용 수정
             existingReview.setReviewContent(reviewDto.getReviewContent());
             existingReview.setReviewTime(LocalDateTime.now());
@@ -52,19 +76,26 @@ public class ReviewService {
             // 2.3 저장 후 DTO 변환 및 반환
             Review updatedReview = reviewRepository.save(existingReview);
             ReviewDto responseDto = reviewConvertor.convertToDto(updatedReview);
-            return ResponseEntity.ok(responseDto);
+            return ResponseEntity.ok(responseDto);  
         }
     
-        // 3. 새로운 리뷰 작성
+        // 3. 리뷰 작성 전 중복체크
+        Review existingReviewForNew = reviewRepository.findByMovieAndUser(movie, user);
+        if (existingReviewForNew != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); // 이미 리뷰가 존재함 응답
+        }
+
+        // 4. 새로운 리뷰 작성
+        reviewDto.setMovieKey(reviewDto.getMovieKey());
         reviewDto.setUserKey(userKey);
         reviewDto.setReviewTime(LocalDateTime.now());
         reviewDto.setReviewLike(0);
     
-        // 4. Review 엔티티 변환 및 저장
+        // 5. Review 엔티티 변환 및 저장
         Review review = reviewConvertor.convertToEntity(reviewDto);
         Review savedReview = reviewRepository.save(review);
     
-        // 5. 저장된 Review 엔티티를 ReviewDto로 변환하여 반환
+        // 6. 저장된 Review 엔티티를 ReviewDto로 변환하여 반환
         ReviewDto responseDto = reviewConvertor.convertToDto(savedReview);
         return ResponseEntity.ok(responseDto);
     }
@@ -120,11 +151,24 @@ public class ReviewService {
     }
 
     // 특정 영화의 모든 리뷰 조회
-    public List<ReviewDto> getReviewsByMovie(ReviewDto reviewDto) {
-        List<Review> reviews = reviewRepository.findByMovie_MovieKey(reviewDto.getMovieKey());
-        return reviews.stream()
-                  .map(reviewConvertor::convertToDto)
-                  .toList();
+    public ResponseEntity<Map<String, Object>> getReviewsByMovie(String movieId) {
+        List<Review> reviews = reviewRepository.findByMovie_MovieKey(movieId);
+        List<ReviewDto> reviewDtos = new ArrayList<>();
+        List<UserDto> reviewers = new ArrayList<>();
+        
+        for(Review review : reviews)    {
+            ReviewDto reviewDto = reviewConvertor.convertToDto(review);
+            User user = review.getUser();
+            UserDto userDto = userConvertor.convertToDto(user);
+            reviewDtos.add(reviewDto);
+            reviewers.add(userDto);
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("reviews", reviewDtos);
+        response.put("reviewers", reviewers);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 특정 사용자의 모든 리뷰 조회

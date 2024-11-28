@@ -1,7 +1,11 @@
 package com.movie.moviecheck.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import com.movie.moviecheck.service.ReviewService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,10 +21,16 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    // 리뷰 조회 및 출력
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> goToGetReviewsByMovie(@RequestParam(name="id") String movieId)    {
+        return reviewService.getReviewsByMovie(movieId);
+    }
+
     // 리뷰 추가
     @PostMapping("/create")
-    public ResponseEntity<ReviewDto> goToAddReview(@RequestBody ReviewDto reviewDto,Movie movie, HttpServletRequest request) {
-        return reviewService.addReview(reviewDto,request);
+    public ResponseEntity<ReviewDto> goToAddReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
+        return reviewService.addReview(reviewDto, request);
     }
     
     // 리뷰 삭제
