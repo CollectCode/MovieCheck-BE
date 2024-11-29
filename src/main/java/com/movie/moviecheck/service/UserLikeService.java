@@ -37,35 +37,33 @@ public class UserLikeService {
         Review review = reviewRepository.findByReviewKey(reviewKey);
         User user = userService.findByKey(userKey);
     
-        // 사용자가 해당 리뷰에 이미 좋아요를 눌렀는지 확인
-        if (!userLikeRepository.existsByUser(user)) {
-            // 좋아요 추가
-            UserLike userLike = new UserLike();
-            userLike.setUser(user);
-            userLike.setReview(review);
-            userLikeRepository.save(userLike);
-    
-            // 리뷰의 좋아요 수 증가
-            review.setReviewLike(review.getReviewLike() != null ? review.getReviewLike() + 1 : 1);
-    
+        // 사용자가 해당 리뷰에 좋아요를 눌렀는지 확인
+        Optional<UserLike> userLike = userLikeRepository.findByUserAndReview(user, review);
+        if (userLike.isPresent()) {
+            // 이미 좋아요를 눌렀다면 좋아요 삭제
+            userLikeRepository.delete(userLike.get());
+
+            // 리뷰의 좋아요 수 감소
+            review.setReviewLike(review.getReviewLike() > 0 ? review.getReviewLike() - 1 : 0);
+
             // 작성자 등급 업데이트
             updateUserGrade(review);
-    
+
             reviewRepository.save(review); // 리뷰 업데이트
         } else {
-            // 좋아요 삭제
-            Optional<UserLike> userLike = userLikeRepository.findByUserAndReview(user, review);
-            if (userLike.isPresent()) {
-                userLikeRepository.delete(userLike.get());
-    
-                // 리뷰의 좋아요 수 감소
-                review.setReviewLike(review.getReviewLike() > 0 ? review.getReviewLike() - 1 : 0);
-    
-                // 작성자 등급 업데이트
-                updateUserGrade(review);
-    
-                reviewRepository.save(review); // 리뷰 업데이트
-            }
+            // 좋아요 추가
+            UserLike newUserLike = new UserLike();
+            newUserLike.setUser(user);
+            newUserLike.setReview(review);
+            userLikeRepository.save(newUserLike);
+
+            // 리뷰의 좋아요 수 증가
+            review.setReviewLike(review.getReviewLike() != null ? review.getReviewLike() + 1 : 1);
+
+            // 작성자 등급 업데이트
+            updateUserGrade(review);
+
+            reviewRepository.save(review); // 리뷰 업데이트
         }
     }
     
