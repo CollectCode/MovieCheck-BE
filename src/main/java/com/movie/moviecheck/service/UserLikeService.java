@@ -31,10 +31,10 @@ public class UserLikeService {
 
     private final UserRepository userRepository;
 
-    public void addLike(ReviewDto reviewDto, HttpServletRequest request) {
+    public void addLike(Integer reviewKey, HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         Integer userKey = (Integer) session.getAttribute("userKey");
-        Review review = reviewRepository.findByReviewKey(reviewDto.getReviewKey());
+        Review review = reviewRepository.findByReviewKey(reviewKey);
         User user = userService.findByKey(userKey);
     
         // 사용자가 해당 리뷰에 이미 좋아요를 눌렀는지 확인

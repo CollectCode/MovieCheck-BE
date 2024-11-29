@@ -1,5 +1,6 @@
 package com.movie.moviecheck.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +11,7 @@ import com.movie.moviecheck.service.UserLikeService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -20,8 +22,8 @@ public class UserLikeController {
     
     private final UserLikeService userLikeService;
 
-    @PostMapping
-    public void goToaddLike(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
-        userLikeService.addLike(reviewDto, request);
+    @GetMapping
+    public void goToaddLike(@RequestParam(name="reviewKey") Integer reviewKey, HttpServletRequest request) {
+        userLikeService.addLike(reviewKey, request);
     }
 }
