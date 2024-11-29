@@ -47,6 +47,16 @@ public class UserGenreService {
                 .body(new WrapperClass<>(genres, msg));
     }
 
+    // 사용자 선호 장르 가져오기
+    public ResponseEntity<WrapperClass<List<GenreDto>>> getLikeGenre(Integer userKey) {
+        UserDto user = userConvertor.convertToDto(userService.findByKey(userKey));
+        String msg = "장르 Get에 성공하셨습니다!";
+        List<GenreDto> genres = getUserGenres(user);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new WrapperClass<>(genres, msg));
+    }
+
     // 사용자가 수정한 장르 적용하기
     public ResponseEntity<WrapperClass<ArrayList<GenreDto>>> setLikeGenre(HttpServletRequest request, GenreDto[] genreDto)  {
         HttpSession session = request.getSession(false);
