@@ -1,6 +1,8 @@
 package com.movie.moviecheck.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity; // User 모델 클래스 필요
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping; // 서비스 클래스 필요
 import org.springframework.web.bind.annotation.PostMapping;

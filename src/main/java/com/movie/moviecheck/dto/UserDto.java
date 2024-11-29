@@ -21,7 +21,7 @@ public class UserDto {
 
     @Email(message = "이메일 형식이 아닙니다.")
     @NotBlank
-    @Size(min=17,max=32)
+    @Size(min=14,max=32)
     private String userEmail;      // 회원 이메일
 
     @NotBlank

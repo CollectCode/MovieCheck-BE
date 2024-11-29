@@ -64,6 +64,14 @@ public class UserService {
             sessionCookie.setPath("/");
             sessionCookie.setMaxAge(60 * 60); // 쿠키 유효 시간 (예: 1시간)
             response.addCookie(sessionCookie);
+            
+            // userKey를 쿠키에 추가
+            Cookie userKeyCookie = new Cookie("userKey", String.valueOf(authenticatedUser.getUserKey()));
+            userKeyCookie.setHttpOnly(false); // 프론트엔드에서 접근 가능
+            userKeyCookie.setPath("/");
+            userKeyCookie.setMaxAge(60 * 60); // 쿠키 유효 시간 (예: 1시간)
+            response.addCookie(userKeyCookie);
+            
             msg = "로그인 성공";
             return ResponseEntity
                     .status(HttpStatus.OK)
@@ -80,11 +88,11 @@ public class UserService {
     public ResponseEntity<WrapperClass<UserDto>> createUser(UserDto userDto) {
         String msg = "회원가입 성공";
 
-        if(userDto.getUserPassword().length() < 7 || userDto.getUserPassword().length() > 21){
+        if(userDto.getUserPassword().length() < 8 || userDto.getUserPassword().length() > 21){
             msg = "비밀번호의 길이는 8글자 ~ 20글자로 해주세요";
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(new WrapperClass<>(userDto, msg));
+                    .status(HttpStatus.CONFLICT)
+                    .body(new WrapperClass<>(null, msg));
         }
         User user = userConvertor.convertToEntity(userDto);
         
@@ -122,8 +130,8 @@ public class UserService {
                         .body(new WrapperClass<>(userEmail,msg));
         }
         // 이메일의 길이 검사
-        if (userEmail.length() < 18 || userEmail.length() > 32) {
-            msg = "이메일의 길이는 8글자 ~ 20글자로 해주세요.";
+        if (userEmail.length() < 15 || userEmail.length() > 32) {
+            msg = "이메일의 길이는 5글자 ~ 20글자로 해주세요.";
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(new WrapperClass<>(null, msg));
@@ -322,7 +330,7 @@ public class UserService {
                 File destinationFile = new File(uploadDir, fileName);
                 try {
                     userImage.transferTo(destinationFile);
-                    user.setUserProfile("http://192.168.0.69:8080/images/users/" + fileName);
+                    user.setUserProfile("http://localhost:8080/images/users/" + fileName);
                     saveUser(user);
                     msg = "이미지 업로드 성공";
                     userDto = userConvertor.convertToDto(user);

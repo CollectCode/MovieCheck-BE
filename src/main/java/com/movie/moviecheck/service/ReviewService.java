@@ -2,6 +2,8 @@ package com.movie.moviecheck.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +104,7 @@ public class ReviewService {
     
 
     // 리뷰 삭제
-    public ResponseEntity<ReviewDto> deleteReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
+    public ResponseEntity<ReviewDto> deleteReview(Integer reviewKey, HttpServletRequest request) {
 
         // 세션에서 userKey 가져오기
         HttpSession session = request.getSession(false); // 세션이 없으면 null 반환
@@ -112,7 +114,7 @@ public class ReviewService {
         Integer userKey = (Integer) session.getAttribute("userKey");
 
         // 리뷰 삭제 로직
-        Review review = reviewRepository.findByReviewKey(reviewDto.getReviewKey());
+        Review review = reviewRepository.findByReviewKey(reviewKey);
 
         // 리뷰가 없으면 404 응답
         if (review == null) {
@@ -156,6 +158,14 @@ public class ReviewService {
         List<ReviewDto> reviewDtos = new ArrayList<>();
         List<UserDto> reviewers = new ArrayList<>();
         
+        // 좋아요 순으로 내림차순
+        Collections.sort(reviewDtos,new Comparator<ReviewDto>() {
+            @Override
+            public int compare(ReviewDto r1, ReviewDto r2){
+                return r2.getReviewLike().compareTo(r1.getReviewLike());
+            }
+        });
+
         for(Review review : reviews)    {
             ReviewDto reviewDto = reviewConvertor.convertToDto(review);
             User user = review.getUser();

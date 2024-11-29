@@ -27,7 +27,7 @@ public class ReviewController {
         return reviewService.getReviewsByMovie(movieId);
     }
 
-    // 리뷰 추가
+    // 리뷰 추가 및 갱신
     @PostMapping("/create")
     public ResponseEntity<ReviewDto> goToAddReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
         return reviewService.addReview(reviewDto, request);
@@ -36,8 +36,8 @@ public class ReviewController {
     // 리뷰 삭제
     // /api/reviews/delete
     @DeleteMapping("/delete")
-    public ResponseEntity<ReviewDto> deleteReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
-        return reviewService.deleteReview(reviewDto,request);
+    public ResponseEntity<ReviewDto> deleteReview(@RequestParam(name="reviewKey") Integer reviewKey , HttpServletRequest request) {
+        return reviewService.deleteReview(reviewKey,request);
     }
 
 }
