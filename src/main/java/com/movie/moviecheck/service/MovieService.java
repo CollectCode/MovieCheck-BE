@@ -4,6 +4,7 @@ import com.movie.moviecheck.converter.GenreConvertor;
 import com.movie.moviecheck.converter.MovieConvertor;
 import com.movie.moviecheck.converter.UserConvertor;
 import com.movie.moviecheck.dto.ActorDto;
+import com.movie.moviecheck.dto.CommentDto;
 import com.movie.moviecheck.dto.DirectorDto;
 import com.movie.moviecheck.dto.GenreDto;
 import com.movie.moviecheck.dto.MovieDto;
@@ -103,18 +104,31 @@ public class MovieService {
                 })
                 .collect(Collectors.toList());
 
-        // 해당 영화의 리뷰 가져오기    
+        // 해당 영화의 리뷰와 댓글 가져오기    
         List<ReviewDto> reviews = movie.getReview().stream()
-                    .map(review -> {
-                        return new ReviewDto(
-                                review.getReviewKey(),
-                                review.getUser().getUserKey(),
-                                review.getReviewContent(),
-                                review.getReviewTime(),
-                                review.getReviewLike()
-                        );
-                    })
-                    .toList();
+                .map(review -> {
+                    // 리뷰에 해당하는 댓글 가져오기
+                    List<CommentDto> comments = review.getComments().stream()
+                            .map(comment -> new CommentDto(
+                                    comment.getCommentKey(),
+                                    comment.getUser().getUserKey(),
+                                    review.getReviewKey(),
+                                    comment.getCommentContent(),
+                                    comment.getCommentTime()
+                            ))
+                            .toList();
+
+                    // 리뷰 DTO 생성 및 댓글 추가
+                    return new ReviewDto(
+                            review.getReviewKey(),
+                            review.getUser().getUserKey(),
+                            review.getReviewContent(),
+                            review.getReviewTime(),
+                            review.getReviewLike(),
+                            comments // 댓글 추가
+                    );
+                })
+                .toList();
 
         // 감독 정보 가져오기
         Director director = movie.getDirector();

@@ -1,6 +1,7 @@
 package com.movie.moviecheck.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -91,4 +92,13 @@ public class CommentService {
         // 4. 댓글 삭제
         commentRepository.delete(comment);
     }
+
+    // 리뷰키를 통해 댓글을 조회
+    public List<Comment> getCommentsByReviewKey(Integer reviewKey)   {
+        return commentRepository.findByReview_ReviewKey(reviewKey);
+    }
+
+    // public List<Comment> getCommentsByReviewKey(String reviewKey) {
+    //     return commentRepository.findByReviewKey(reviewKey);
+    // }
 }

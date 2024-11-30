@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,6 +21,7 @@ public class ReviewDto {
     private String reviewContent;      // 리뷰 내용
     private LocalDateTime reviewTime; // 리뷰 시간
     private Integer reviewLike;       // 긍정적인 평가 수
+    private List<CommentDto> commentDto; // 배우 이름, 사진
 
     public ReviewDto(Integer reviewKey, Integer userKey, String reviewContent, LocalDateTime reviewTime,
             Integer reviewLike) {
@@ -29,4 +31,15 @@ public class ReviewDto {
                 this.reviewTime = reviewTime;
                 this.reviewLike = reviewLike;
     }
+
+    public ReviewDto(Integer reviewKey, Integer userKey, String reviewContent, LocalDateTime reviewTime,
+            Integer reviewLike, List<CommentDto> commentDto) {
+                this.reviewKey = reviewKey;
+                this.userKey = userKey;
+                this.reviewContent = reviewContent;
+                this.reviewTime = reviewTime;
+                this.reviewLike = reviewLike;
+                this.commentDto = commentDto;
+    }
+
 }

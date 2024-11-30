@@ -15,13 +15,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.movie.moviecheck.converter.CommentConvertor;
 import com.movie.moviecheck.converter.ReviewConvertor;
 import com.movie.moviecheck.converter.UserConvertor;
+import com.movie.moviecheck.dto.CommentDto;
 import com.movie.moviecheck.dto.ReviewDto;
 import com.movie.moviecheck.dto.UserDto;
+import com.movie.moviecheck.model.Comment;
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.model.User;
+import com.movie.moviecheck.repository.CommentRepository;
 import com.movie.moviecheck.repository.MovieRepository;
 import com.movie.moviecheck.repository.ReviewRepository;
 import com.movie.moviecheck.repository.UserRepository;
@@ -34,12 +38,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReviewService {
 
+    private final CommentService commentService;
+
     private final ReviewRepository reviewRepository;
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     private final ReviewConvertor reviewConvertor;
     private final UserConvertor userConvertor;
+    private final CommentConvertor commentConvertor;
     
     // 리뷰 추가
     public ResponseEntity<ReviewDto> addReview(@RequestBody ReviewDto reviewDto, HttpServletRequest request) {
@@ -155,31 +163,41 @@ public class ReviewService {
     // 특정 영화의 모든 리뷰 조회
     public ResponseEntity<Map<String, Object>> getReviewsByMovie(String movieId) {
         List<Review> reviews = reviewRepository.findByMovie_MovieKey(movieId);
+
         List<ReviewDto> reviewDtos = new ArrayList<>();
         List<UserDto> reviewers = new ArrayList<>();
-        
-        // 좋아요 순으로 내림차순
-        Collections.sort(reviewDtos,new Comparator<ReviewDto>() {
-            @Override
-            public int compare(ReviewDto r1, ReviewDto r2){
-                return r2.getReviewLike().compareTo(r1.getReviewLike());
-            }
-        });
 
-        for(Review review : reviews)    {
+        // 여러 리뷰를 반복문으로 List<ReviewDto>로 변환
+        for (Review review : reviews) {
             ReviewDto reviewDto = reviewConvertor.convertToDto(review);
             User user = review.getUser();
+            // 해당 리뷰의 여러 Comment를 가져옴
+            List<Comment> comments = commentService.getCommentsByReviewKey(review.getReviewKey());
+
+            // List<CommentDto> 생성
+            List<CommentDto> commentDtos = new ArrayList<>();
+            for (Comment comment : comments) {
+                CommentDto commentDto = commentConvertor.convertToDto(comment);
+                commentDtos.add(commentDto);
+            }
+            // CommentDto 리스트를 ReviewDto에 설정
+            reviewDto.setCommentDto(commentDtos);
+            // User를 UserDto로 변환 후 추가
             UserDto userDto = userConvertor.convertToDto(user);
+            // 변환된 객체를 리스트에 추가
             reviewDtos.add(reviewDto);
             reviewers.add(userDto);
         }
-
+        
+        // 좋아요 순으로 내림차순 정렬
+        reviewDtos.sort((r1, r2) -> r2.getReviewLike().compareTo(r1.getReviewLike()));
+        // 결과를 Map에 담아 반환
         Map<String, Object> response = new HashMap<>();
         response.put("reviews", reviewDtos);
         response.put("reviewers", reviewers);
-
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 
     // 특정 사용자의 모든 리뷰 조회
     public List<Review> getReviewsByUser(int userKey) {
