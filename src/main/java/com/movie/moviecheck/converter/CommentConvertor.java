@@ -1,8 +1,5 @@
 package com.movie.moviecheck.converter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
 
 import com.movie.moviecheck.dto.CommentDto;

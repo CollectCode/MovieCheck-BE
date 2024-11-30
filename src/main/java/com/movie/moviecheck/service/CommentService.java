@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.movie.moviecheck.converter.CommentConvertor;
 import com.movie.moviecheck.dto.CommentDto;
-import com.movie.moviecheck.dto.ReviewDto;
 import com.movie.moviecheck.model.Comment;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.model.User;
 import com.movie.moviecheck.repository.CommentRepository;
 import com.movie.moviecheck.repository.ReviewRepository;
-import com.mysql.cj.protocol.x.Ok;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

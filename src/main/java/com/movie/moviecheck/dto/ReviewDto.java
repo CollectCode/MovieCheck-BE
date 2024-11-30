@@ -22,6 +22,7 @@ public class ReviewDto {
     private LocalDateTime reviewTime; // 리뷰 시간
     private Integer reviewLike;       // 긍정적인 평가 수
     private List<CommentDto> commentDto; // 배우 이름, 사진
+    private List<UserDto> commenters; // 배우 이름, 사진
 
     public ReviewDto(Integer reviewKey, Integer userKey, String reviewContent, LocalDateTime reviewTime,
             Integer reviewLike) {

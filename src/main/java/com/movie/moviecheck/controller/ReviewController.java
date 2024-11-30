@@ -1,6 +1,5 @@
 package com.movie.moviecheck.controller;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import com.movie.moviecheck.dto.ReviewDto;
-import com.movie.moviecheck.model.Movie;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,7 +18,7 @@ import com.movie.moviecheck.model.Movie;
 public class ReviewController {
 
     private final ReviewService reviewService;
-
+    
     // 리뷰 조회 및 출력
     @GetMapping
     public ResponseEntity<Map<String, Object>> goToGetReviewsByMovie(@RequestParam(name="id") String movieId)    {

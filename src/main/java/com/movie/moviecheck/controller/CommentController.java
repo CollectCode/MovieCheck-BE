@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.movie.moviecheck.dto.CommentDto;
-import com.movie.moviecheck.dto.ReviewDto;
 import com.movie.moviecheck.service.CommentService;
 
 import jakarta.servlet.http.HttpServletRequest;

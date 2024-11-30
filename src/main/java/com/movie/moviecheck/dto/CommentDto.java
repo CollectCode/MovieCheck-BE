@@ -18,4 +18,5 @@ public class CommentDto {
     private Integer reviewKey;
     private String commentContent;
     private LocalDateTime commenTime;
+    
 }

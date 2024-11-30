@@ -2,14 +2,11 @@ package com.movie.moviecheck.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -25,7 +22,6 @@ import com.movie.moviecheck.model.Comment;
 import com.movie.moviecheck.model.Movie;
 import com.movie.moviecheck.model.Review;
 import com.movie.moviecheck.model.User;
-import com.movie.moviecheck.repository.CommentRepository;
 import com.movie.moviecheck.repository.MovieRepository;
 import com.movie.moviecheck.repository.ReviewRepository;
 import com.movie.moviecheck.repository.UserRepository;
@@ -43,7 +39,6 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
 
     private final ReviewConvertor reviewConvertor;
     private final UserConvertor userConvertor;
@@ -175,12 +170,17 @@ public class ReviewService {
             
             // List<CommentDto> 생성
             List<CommentDto> commentDtos = new ArrayList<>();
+            List<UserDto> commenters = new ArrayList<>();
             for (Comment comment : comments) {
                 CommentDto commentDto = commentConvertor.convertToDto(comment);
+                User commentUser = userRepository.findByUserKey(commentDto.getUserKey());
+                UserDto commentUserDto = userConvertor.convertToDto(commentUser);
+                commenters.add(commentUserDto);
                 commentDtos.add(commentDto);
             }
             // CommentDto 리스트를 ReviewDto에 설정
             reviewDto.setCommentDto(commentDtos);
+            reviewDto.setCommenters(commenters);
             // User를 UserDto로 변환 후 추가
             UserDto userDto = userConvertor.convertToDto(user);
             // 변환된 객체를 리스트에 추가
