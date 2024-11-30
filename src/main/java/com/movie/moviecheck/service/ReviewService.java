@@ -163,7 +163,6 @@ public class ReviewService {
     // 특정 영화의 모든 리뷰 조회
     public ResponseEntity<Map<String, Object>> getReviewsByMovie(String movieId) {
         List<Review> reviews = reviewRepository.findByMovie_MovieKey(movieId);
-
         List<ReviewDto> reviewDtos = new ArrayList<>();
         List<UserDto> reviewers = new ArrayList<>();
 
@@ -173,7 +172,7 @@ public class ReviewService {
             User user = review.getUser();
             // 해당 리뷰의 여러 Comment를 가져옴
             List<Comment> comments = commentService.getCommentsByReviewKey(review.getReviewKey());
-
+            
             // List<CommentDto> 생성
             List<CommentDto> commentDtos = new ArrayList<>();
             for (Comment comment : comments) {
@@ -188,7 +187,7 @@ public class ReviewService {
             reviewDtos.add(reviewDto);
             reviewers.add(userDto);
         }
-        
+
         // 좋아요 순으로 내림차순 정렬
         reviewDtos.sort((r1, r2) -> r2.getReviewLike().compareTo(r1.getReviewLike()));
         // 결과를 Map에 담아 반환
