@@ -156,19 +156,18 @@ public class ReviewService {
     }
 
     // 특정 영화의 모든 리뷰 조회
+    // 특정 영화의 모든 리뷰 조회
     public ResponseEntity<Map<String, Object>> getReviewsByMovie(String movieId) {
         List<Review> reviews = reviewRepository.findByMovie_MovieKey(movieId);
         List<ReviewDto> reviewDtos = new ArrayList<>();
         List<UserDto> reviewers = new ArrayList<>();
 
-        // 여러 리뷰를 반복문으로 List<ReviewDto>로 변환
+        // 리뷰와 사용자 정보를 변환하여 List에 추가
         for (Review review : reviews) {
             ReviewDto reviewDto = reviewConvertor.convertToDto(review);
             User user = review.getUser();
-            // 해당 리뷰의 여러 Comment를 가져옴
-            List<Comment> comments = commentService.getCommentsByReviewKey(review.getReviewKey());
             
-            // List<CommentDto> 생성
+            List<Comment> comments = commentService.getCommentsByReviewKey(review.getReviewKey());
             List<CommentDto> commentDtos = new ArrayList<>();
             List<UserDto> commenters = new ArrayList<>();
             for (Comment comment : comments) {
@@ -178,24 +177,36 @@ public class ReviewService {
                 commenters.add(commentUserDto);
                 commentDtos.add(commentDto);
             }
-            // CommentDto 리스트를 ReviewDto에 설정
             reviewDto.setCommentDto(commentDtos);
             reviewDto.setCommenters(commenters);
-            // User를 UserDto로 변환 후 추가
-            UserDto userDto = userConvertor.convertToDto(user);
-            // 변환된 객체를 리스트에 추가
             reviewDtos.add(reviewDto);
-            reviewers.add(userDto);
+            reviewers.add(userConvertor.convertToDto(user));
         }
 
-        // 좋아요 순으로 내림차순 정렬
-        reviewDtos.sort((r1, r2) -> r2.getReviewLike().compareTo(r1.getReviewLike()));
+        // 인덱스를 기반으로 정렬하기 위해 인덱스와 함께 페어로 저장
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < reviewDtos.size(); i++) {
+            indices.add(i);
+        }
+
+        // 좋아요 기준으로 indices 정렬
+        indices.sort((i1, i2) -> reviewDtos.get(i2).getReviewLike().compareTo(reviewDtos.get(i1).getReviewLike()));
+
+        // 정렬된 인덱스를 기반으로 새롭게 리스트 생성
+        List<ReviewDto> sortedReviewDtos = new ArrayList<>();
+        List<UserDto> sortedReviewers = new ArrayList<>();
+        for (int index : indices) {
+            sortedReviewDtos.add(reviewDtos.get(index));
+            sortedReviewers.add(reviewers.get(index));
+        }
+
         // 결과를 Map에 담아 반환
         Map<String, Object> response = new HashMap<>();
-        response.put("reviews", reviewDtos);
-        response.put("reviewers", reviewers);
+        response.put("reviews", sortedReviewDtos);
+        response.put("reviewers", sortedReviewers);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 
 
     // 특정 사용자의 모든 리뷰 조회
