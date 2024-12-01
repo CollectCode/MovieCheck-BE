@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.movie.moviecheck.dto.CommentDto;
@@ -28,7 +29,7 @@ public class CommentController {
 
     // 특정 리뷰에 남긴 댓글을 삭제하는 기능
     @DeleteMapping
-    public ResponseEntity<CommentDto> goToDeleteComment(@RequestBody CommentDto commnetDto, HttpServletRequest request) {
-        return commentService.deleteComment(commnetDto, request);
+    public ResponseEntity<CommentDto> goToDeleteComment(@RequestParam(name="commentKey") Integer commentKey, HttpServletRequest request) {
+        return commentService.deleteComment(commentKey, request);
     }
 }
