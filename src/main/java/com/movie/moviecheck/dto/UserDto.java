@@ -35,8 +35,12 @@ public class UserDto {
     
     @NotNull
     private int userGender;
+
     private String userProfile;
+
     private String userGrade = "관람객";
+
+    private int userLikeCount = 0;
     
     public UserDto(String userEmail, String userPassword, String userName, int userGender) {
         this.userEmail = userEmail;

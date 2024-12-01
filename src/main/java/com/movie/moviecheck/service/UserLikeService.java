@@ -104,6 +104,7 @@ public class UserLikeService {
         }
     
         String newGrade = reviewService.calculateUserGrade(totalLikes);
+        reviewUser.setUserLikeCount(totalLikes);
         reviewUser.setUserGrade(newGrade);
         userRepository.save(reviewUser);
     }

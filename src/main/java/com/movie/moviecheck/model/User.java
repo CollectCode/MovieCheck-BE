@@ -54,6 +54,10 @@ public class User {
     @Column(name = "user_profile", length = 255) // 이미지 경로
     private String userProfile;
 
+    // 누적 좋아요
+    @Column(name = "user_like_count")
+    private int userLikeCount;
+
     @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
     @JsonManagedReference
     private List<UserGenre> userGenre;

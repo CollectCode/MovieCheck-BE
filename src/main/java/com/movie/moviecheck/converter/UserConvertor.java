@@ -22,6 +22,7 @@ public class UserConvertor {
                    .userGender(userDto.getUserGender())
                    .userProfile(userDto.getUserProfile())
                    .userGrade(userDto.getUserGrade())
+                   .userLikeCount(userDto.getUserLikeCount())
                    .build();
     }
 
@@ -39,6 +40,7 @@ public class UserConvertor {
                    .userGender(user.getUserGender())
                    .userProfile(user.getUserProfile())
                    .userGrade(user.getUserGrade())
+                   .userLikeCount(user.getUserLikeCount())
                    .build();
     }
 }
