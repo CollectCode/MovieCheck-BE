@@ -149,9 +149,9 @@ public class UserService {
         }
     }
 
-    // 이메일 형식 유효성 검사
+    // 이메일 형식 유효성 검사 (특정 도메인만 허용)
     private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        String emailRegex = "^[A-Za-z0-9._%+-]+@(naver\\.com|gmail\\.com|g\\.yju\\.ac\\.kr|daum\\.com|kakao\\.com)$";
         return email != null && email.matches(emailRegex);
     }
 
