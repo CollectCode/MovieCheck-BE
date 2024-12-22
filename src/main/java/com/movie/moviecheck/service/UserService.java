@@ -101,7 +101,7 @@ public class UserService {
         user.setUserPassword(hashedPassword); // 해싱된 비밀번호로 설정
 
         // 기본 프로필 이미지로 설정
-        user.setUserProfile("http://localhost:8080/images/users/default.PNG");
+        user.setUserProfile("http://43.203.83.192:8080/users/default.png");
         // 유저저장
         User savedUser = saveUser(user);
 
@@ -208,7 +208,7 @@ public class UserService {
                 // 사용자 정보 가져오기
                 UserDto userDto = userConvertor.convertToDto(user);
                 if(userDto.getUserProfile()==null || userDto.getUserProfile().equals("")){
-                    userDto.setUserProfile("http://localhost:8080/images/users/default.PNG");
+                    userDto.setUserProfile("http://43.203.83.192:8080/users/default.png");
                 }
                 msg = "마이페이지 로딩 성공.";
                 return ResponseEntity.ok(new WrapperClass<>(userDto, msg)); // 사용자 정보를 메시지와 함께 반환
@@ -325,12 +325,12 @@ public class UserService {
         UserDto userDto = null;
         if (user != null) {
             if (userImage != null && !userImage.isEmpty()) {
-                String uploadDir = new File("src/main/resources/static/images/users/").getAbsolutePath(); // 절대 경로로 변경
+                String uploadDir = new File("/home/ec2-user/movieCheck/images/users/").getAbsolutePath(); // 절대 경로로 변경
                 String fileName = "user_" + user.getUserKey() + ".png"; // UUID 추가
                 File destinationFile = new File(uploadDir, fileName);
                 try {
                     userImage.transferTo(destinationFile);
-                    user.setUserProfile("http://localhost:8080/images/users/" + fileName);
+                    user.setUserProfile("http://43.203.83.192:8080/users/" + fileName);
                     saveUser(user);
                     msg = "이미지 업로드 성공";
                     userDto = userConvertor.convertToDto(user);
