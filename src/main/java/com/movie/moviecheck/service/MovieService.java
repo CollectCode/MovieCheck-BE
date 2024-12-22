@@ -1,5 +1,20 @@
 package com.movie.moviecheck.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 import com.movie.moviecheck.converter.GenreConvertor;
 import com.movie.moviecheck.converter.MovieConvertor;
 import com.movie.moviecheck.converter.UserConvertor;
@@ -24,21 +39,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor 
@@ -65,7 +65,7 @@ public class MovieService {
                                                         dto.put("movieTitle", movie.getMovieTitle());
                                                         String moviePoster = movie.getMoviePoster();
                                                         if (moviePoster.equals("")) {
-                                                            moviePoster = "http://localhost:8080/images/movies/default.png";}
+                                                            moviePoster = "http://43.203.83.192:8080/movies/default.png";}
                                                         dto.put("moviePoster", moviePoster);
                                                         return dto;
                                                     })
@@ -94,7 +94,7 @@ public class MovieService {
                     Actor actor = movieActor.getActor();
                     String actorImage = actor.getActorImage();
                     if(actorImage.equals("")){
-                        actorImage = "http://localhost:8080/images/actors/default.png";
+                        actorImage = "http://43.203.83.192:8080/actors/default.png";
                     }
                     return new ActorDto(
                             actor.getActorKey(),
@@ -136,7 +136,7 @@ public class MovieService {
         if (director != null) {
             String directorImage = director.getDirectorImage();
         if(directorImage.equals("")){
-            directorImage = "http://localhost:8080/images/directors/default.png";}
+            directorImage = "http://43.203.83.192:8080/directors/default.png";}
             directorDto = new DirectorDto(
                     director.getDirectorName(),
                     directorImage
